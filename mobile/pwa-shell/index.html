@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="manifest" href="/mobile/pwa-shell/public/manifest.json">
+    <title>Vulcano • Offline LLM</title>
+  </head>
+  <body style="font-family: system-ui, sans-serif; margin:14px">
+    <h2>Vulcano — Offline LLM (WebLLM)</h2>
+
+    <label>Modello (puoi cambiare più tardi):</label><br/>
+    <input id="model" value="Llama-3.2-1B-Instruct-q4f16_1" style="width:100%;padding:8px"/>
+
+    <div id="progress" style="margin:8px 0; font-size:14px; opacity:.8">Stato: inattivo</div>
+
+    <textarea id="prompt" rows="6" placeholder="Scrivi qui…" style="width:100%;padding:10px"></textarea>
+    <button id="run" style="width:100%;padding:12px;margin-top:8px">Esegui offline</button>
+
+    <pre id="out" style="white-space:pre-wrap; margin-top:12px"></pre>
+
+    <script type="module">
+      import { CreateWebWorkerMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+
+      const prog = (t) => (msg) => { t.textContent = `Stato: ${msg.text} ${(msg.progress||0)*100|0}%`; };
+
+      let engine = null;
+      const progress = document.getElementById('progress');
+      const btn = document.getElementById('run');
+
+      async function ensureEngine() {
+        if (engine) return engine;
+        const modelId = document.getElementById('model').value.trim();
+        progress.textContent = "Stato: inizializzazione…";
+        engine = await CreateWebWorkerMLCEngine(
+          modelId,
+          { init_progress_callback: prog(progress) }
+        );
+        return engine;
+      }
+
+      btn.onclick = async () => {
+        btn.disabled = true;
+        const text = document.getElementById('prompt').value.trim();
+        const out = document.getElementById('out');
+        out.textContent = "";
+        try {
+          const eng = await ensureEngine();
+          const stream = await eng.chat.completions.create({
+            model: "any", // ignorato: usa il modello caricato
+            messages: [{ role: "user", content: text }],
+            stream: true,
+          });
+          for await (const chunk of stream) {
+            const delta = chunk.choices?.[0]?.delta?.content || "";
+            if (delta) out.textContent += delta;
+          }
+        } catch (e) {
+          out.textContent = "Errore: " + (e?.message || e);
+          progress.textContent = "Stato: errore (prova un altro model id)";
+        } finally {
+          btn.disabled = false;
+        }
+      };
+    </script>
+  </body>
+</html>
