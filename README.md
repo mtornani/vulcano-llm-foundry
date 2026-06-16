@@ -1,5 +1,10 @@
 # Open Source, Actively Maintained Web Apps for LLMs 💬
 
+> 🌋 **Vulcano — Fucina di Agenti AI (offline, mobile-first):** una PWA che fa girare gli LLM
+> **interamente sul dispositivo** via [WebLLM](https://github.com/mlc-ai/web-llm), senza API e senza chiavi.
+> Agenti personalizzabili per contesto/uso, installabile e base per una futura app Android.
+> → [`mobile/pwa-shell/`](mobile/pwa-shell/)
+
 Jump-start your LLM project by starting from an app, not a framework. This repository aggregates high-quality, functioning web applications for use cases including Chatbots, [Natural Language Interfaces](https://colinharman.substack.com/i/137091060/natural-language-interfaces-nli), Assistants, and Question Answering Systems. It compares projects along important dimensions for these use cases, to help you choose the right starting point for your application.
 
 To ensure the utmost quality and usability, projects must adhere to the following criteria to be included:

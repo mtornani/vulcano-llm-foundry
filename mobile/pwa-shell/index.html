@@ -2,66 +2,286 @@
 <html lang="it">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <link rel="manifest" href="/mobile/pwa-shell/public/manifest.json">
-    <title>Vulcano • Offline LLM</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b1020" />
+    <link rel="manifest" href="public/manifest.json" />
+    <link rel="apple-touch-icon" href="public/icons/icon-192.png" />
+    <title>Vulcano • Fucina di Agenti AI (offline)</title>
+    <style>
+      :root {
+        --bg: #0b1020; --panel: #141b2e; --panel-2: #1b2440;
+        --text: #e8ecf6; --muted: #9aa6c2; --accent: #ff6a3d; --accent-2: #4f8cff;
+        --ok: #34d399; --line: #263150;
+      }
+      * { box-sizing: border-box; }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        margin: 0; background: var(--bg); color: var(--text);
+        padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+      }
+      header {
+        display: flex; align-items: center; gap: 10px;
+        padding: 12px 14px; border-bottom: 1px solid var(--line);
+        position: sticky; top: 0; background: var(--bg); z-index: 5;
+      }
+      header h1 { font-size: 17px; margin: 0; flex: 1; }
+      .badge { font-size: 12px; padding: 3px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+      .badge.on { color: var(--ok); border-color: var(--ok); }
+      .badge.off { color: var(--accent); border-color: var(--accent); }
+      main { max-width: 760px; margin: 0 auto; padding: 14px; }
+      .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; margin-bottom: 14px; }
+      .card h2 { font-size: 14px; margin: 0 0 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+      label { font-size: 13px; color: var(--muted); display: block; margin: 8px 0 4px; }
+      select, input, textarea, button {
+        font: inherit; color: var(--text); width: 100%;
+        background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 11px;
+      }
+      textarea { resize: vertical; }
+      button { cursor: pointer; background: var(--panel-2); }
+      button.primary { background: var(--accent); border-color: var(--accent); color: #1a0f0a; font-weight: 600; }
+      button.ghost { background: transparent; }
+      .row { display: flex; gap: 8px; }
+      .row > * { flex: 1; }
+      .hint { font-size: 12px; color: var(--muted); margin-top: 6px; }
+      .check { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+      .check input { width: auto; }
+      #progress { font-size: 13px; color: var(--muted); margin-top: 8px; min-height: 18px; }
+      #chat { display: flex; flex-direction: column; gap: 10px; }
+      .msg { padding: 10px 12px; border-radius: 12px; max-width: 90%; white-space: pre-wrap; line-height: 1.4; }
+      .msg.user { align-self: flex-end; background: var(--accent-2); color: #08122b; }
+      .msg.assistant { align-self: flex-start; background: var(--panel-2); border: 1px solid var(--line); }
+      .composer { display: flex; gap: 8px; align-items: flex-end; }
+      .composer textarea { flex: 1; }
+      .composer button { width: auto; padding: 11px 16px; }
+      .small { font-size: 12px; }
+      footer { text-align: center; color: var(--muted); font-size: 12px; padding: 8px 14px 24px; }
+      a { color: var(--accent-2); }
+    </style>
   </head>
-  <body style="font-family: system-ui, sans-serif; margin:14px">
-    <h2>Vulcano — Offline LLM (WebLLM)</h2>
+  <body>
+    <header>
+      <h1>🌋 Vulcano — Fucina di Agenti</h1>
+      <span id="net" class="badge">offline-ready</span>
+    </header>
 
-    <label>Modello (puoi cambiare più tardi):</label><br/>
-    <input id="model" value="Llama-3.2-1B-Instruct-q4f16_1" style="width:100%;padding:8px"/>
+    <main>
+      <div class="card">
+        <h2>1 · Agente</h2>
+        <label for="agentSel">Scegli o crea il tuo agente</label>
+        <select id="agentSel"></select>
+        <label for="sys">Istruzioni (system prompt) — modificabili</label>
+        <textarea id="sys" rows="4" placeholder="Sei un assistente utile…"></textarea>
+        <div class="row" style="margin-top:8px">
+          <input id="agentName" placeholder="Nome nuovo agente (es. Avvocato)" />
+          <button id="saveAgent" class="ghost">💾 Salva</button>
+        </div>
+        <button id="delAgent" class="ghost small" style="margin-top:8px">🗑️ Elimina agente personalizzato selezionato</button>
+        <div class="hint">Gli agenti personalizzati restano salvati sul dispositivo (nessun server).</div>
+      </div>
 
-    <div id="progress" style="margin:8px 0; font-size:14px; opacity:.8">Stato: inattivo</div>
+      <div class="card">
+        <h2>2 · Modello locale</h2>
+        <label for="model">Modello (gira nel browser, nessuna API)</label>
+        <select id="model"></select>
+        <div class="check">
+          <input type="checkbox" id="showAll" />
+          <label for="showAll" style="margin:0">Mostra tutti i modelli (anche pesanti)</label>
+        </div>
+        <button id="load" class="ghost" style="margin-top:10px">⬇️ Carica / cambia modello</button>
+        <div id="progress">Stato: inattivo</div>
+        <div class="hint">Suggerito su mobile: 0.5B–2B. Il modello si scarica una volta e resta in cache offline.</div>
+      </div>
 
-    <textarea id="prompt" rows="6" placeholder="Scrivi qui…" style="width:100%;padding:10px"></textarea>
-    <button id="run" style="width:100%;padding:12px;margin-top:8px">Esegui offline</button>
+      <div class="card">
+        <h2>3 · Conversazione</h2>
+        <div id="chat"></div>
+        <div class="composer" style="margin-top:12px">
+          <textarea id="prompt" rows="2" placeholder="Scrivi all'agente…"></textarea>
+          <button id="send" class="primary">Invia</button>
+        </div>
+        <button id="reset" class="ghost small" style="margin-top:8px">↺ Nuova conversazione</button>
+      </div>
+    </main>
 
-    <pre id="out" style="white-space:pre-wrap; margin-top:12px"></pre>
+    <footer>100% locale · offline · senza chiavi API — base per una futura app Android</footer>
 
     <script type="module">
-      import { CreateWebWorkerMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+      import * as webllm from "https://esm.run/@mlc-ai/web-llm";
 
-      const prog = (t) => (msg) => { t.textContent = `Stato: ${msg.text} ${(msg.progress||0)*100|0}%`; };
+      const $ = (id) => document.getElementById(id);
+      const STORE = "vulcano.agents";
 
+      // --- Agenti predefiniti (per contesto/uso) ---
+      const BUILTIN = [
+        { id: "generale", name: "🤝 Assistente generale", system: "Sei un assistente utile, conciso e in italiano. Rispondi in modo chiaro e diretto." },
+        { id: "coder", name: "💻 Programmatore", system: "Sei un assistente di programmazione esperto. Fornisci codice corretto e spiegazioni brevi. Usa blocchi di codice." },
+        { id: "traduttore", name: "🌐 Traduttore IT⇄EN", system: "Sei un traduttore. Traduci il testo dell'utente tra italiano e inglese, restituendo solo la traduzione." },
+        { id: "riassunto", name: "✂️ Riassuntore", system: "Riassumi il testo dell'utente in pochi punti chiave, in italiano, mantenendo le informazioni essenziali." },
+        { id: "brainstorm", name: "💡 Brainstorming", system: "Sei un partner creativo. Genera idee originali e concrete, in elenco puntato, in italiano." },
+        { id: "tutor", name: "🎓 Tutor", system: "Sei un tutor paziente. Spiega i concetti in modo semplice con esempi quotidiani, in italiano." },
+      ];
+
+      const loadCustom = () => { try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch { return []; } };
+      const saveCustom = (a) => localStorage.setItem(STORE, JSON.stringify(a));
+
+      function renderAgents(selectId) {
+        const sel = $("agentSel");
+        const custom = loadCustom();
+        sel.innerHTML = "";
+        const add = (a, group) => {
+          const o = document.createElement("option");
+          o.value = (group === "c" ? "c:" : "b:") + a.id;
+          o.textContent = (group === "c" ? "★ " : "") + a.name;
+          sel.appendChild(o);
+        };
+        BUILTIN.forEach((a) => add(a, "b"));
+        custom.forEach((a) => add(a, "c"));
+        if (selectId) sel.value = selectId;
+        applyAgent();
+      }
+
+      function currentAgent() {
+        const v = $("agentSel").value || "b:generale";
+        const [g, id] = v.split(":");
+        const list = g === "c" ? loadCustom() : BUILTIN;
+        return list.find((a) => a.id === id) || BUILTIN[0];
+      }
+
+      function applyAgent() {
+        const a = currentAgent();
+        $("sys").value = a.system;
+        resetChat();
+      }
+
+      // --- Modelli (lista dinamica dalla libreria) ---
+      function renderModels() {
+        const sel = $("model");
+        const showAll = $("showAll").checked;
+        const list = webllm.prebuiltAppConfig.model_list
+          .filter((m) => showAll || m.low_resource_required)
+          .sort((a, b) => (a.vram_required_MB || 1e9) - (b.vram_required_MB || 1e9));
+        const prev = sel.value;
+        sel.innerHTML = "";
+        for (const m of list) {
+          const o = document.createElement("option");
+          const gb = m.vram_required_MB ? ` (~${(m.vram_required_MB / 1024).toFixed(1)} GB)` : "";
+          o.value = m.model_id;
+          o.textContent = m.model_id + gb;
+          sel.appendChild(o);
+        }
+        // Default ragionevole per mobile.
+        const def = list.find((m) => /Qwen2\.5-1\.5B|Llama-3\.2-1B/.test(m.model_id)) || list[0];
+        sel.value = list.some((m) => m.model_id === prev) ? prev : (def ? def.model_id : "");
+      }
+
+      // --- Engine WebLLM ---
       let engine = null;
-      const progress = document.getElementById('progress');
-      const btn = document.getElementById('run');
+      let loadedModel = null;
+      let busy = false;
+      const history = []; // {role, content}
 
-      async function ensureEngine() {
-        if (engine) return engine;
-        const modelId = document.getElementById('model').value.trim();
-        progress.textContent = "Stato: inizializzazione…";
-        engine = await CreateWebWorkerMLCEngine(
-          modelId,
-          { init_progress_callback: prog(progress) }
-        );
+      const onProgress = (r) => { $("progress").textContent = `Stato: ${r.text} ${(r.progress || 0) * 100 | 0}%`; };
+
+      async function ensureModel() {
+        const id = $("model").value;
+        if (engine && loadedModel === id) return engine;
+        $("progress").textContent = "Stato: inizializzazione…";
+        if (!engine) {
+          engine = await webllm.CreateMLCEngine(id, { initProgressCallback: onProgress });
+        } else {
+          await engine.reload(id);
+        }
+        loadedModel = id;
+        $("progress").textContent = `Stato: pronto (${id})`;
         return engine;
       }
 
-      btn.onclick = async () => {
-        btn.disabled = true;
-        const text = document.getElementById('prompt').value.trim();
-        const out = document.getElementById('out');
-        out.textContent = "";
+      function addMsg(role, text) {
+        const div = document.createElement("div");
+        div.className = "msg " + role;
+        div.textContent = text;
+        $("chat").appendChild(div);
+        div.scrollIntoView({ block: "end" });
+        return div;
+      }
+
+      function resetChat() {
+        history.length = 0;
+        $("chat").innerHTML = "";
+      }
+
+      async function send() {
+        if (busy) return;
+        const text = $("prompt").value.trim();
+        if (!text) return;
+        busy = true; $("send").disabled = true;
+        $("prompt").value = "";
+        addMsg("user", text);
+        history.push({ role: "user", content: text });
+        const out = addMsg("assistant", "…");
         try {
-          const eng = await ensureEngine();
-          const stream = await eng.chat.completions.create({
-            model: "any", // ignorato: usa il modello caricato
-            messages: [{ role: "user", content: text }],
-            stream: true,
-          });
+          const eng = await ensureModel();
+          const messages = [{ role: "system", content: $("sys").value.trim() || "Sei un assistente utile." }, ...history];
+          const stream = await eng.chat.completions.create({ messages, stream: true, temperature: 0.7 });
+          let acc = "";
+          out.textContent = "";
           for await (const chunk of stream) {
-            const delta = chunk.choices?.[0]?.delta?.content || "";
-            if (delta) out.textContent += delta;
+            const d = chunk.choices?.[0]?.delta?.content || "";
+            if (d) { acc += d; out.textContent = acc; out.scrollIntoView({ block: "end" }); }
           }
+          history.push({ role: "assistant", content: acc });
         } catch (e) {
           out.textContent = "Errore: " + (e?.message || e);
-          progress.textContent = "Stato: errore (prova un altro model id)";
+          $("progress").textContent = "Stato: errore (prova un modello più leggero)";
         } finally {
-          btn.disabled = false;
+          busy = false; $("send").disabled = false;
         }
+      }
+
+      // --- Eventi UI ---
+      $("agentSel").onchange = applyAgent;
+      $("saveAgent").onclick = () => {
+        const name = $("agentName").value.trim();
+        const system = $("sys").value.trim();
+        if (!name || !system) { alert("Inserisci nome e istruzioni."); return; }
+        const custom = loadCustom();
+        const id = "u" + Date.now();
+        custom.push({ id, name, system });
+        saveCustom(custom);
+        $("agentName").value = "";
+        renderAgents("c:" + id);
       };
+      $("delAgent").onclick = () => {
+        const v = $("agentSel").value;
+        if (!v.startsWith("c:")) { alert("Seleziona prima un agente personalizzato (★)."); return; }
+        const id = v.slice(2);
+        saveCustom(loadCustom().filter((a) => a.id !== id));
+        renderAgents("b:generale");
+      };
+      $("showAll").onchange = renderModels;
+      $("load").onclick = () => ensureModel().catch((e) => { $("progress").textContent = "Errore: " + (e?.message || e); });
+      $("send").onclick = send;
+      $("prompt").onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } };
+      $("reset").onclick = resetChat;
+
+      // --- Stato rete ---
+      const net = $("net");
+      const setNet = () => {
+        if (navigator.onLine) { net.textContent = "online"; net.className = "badge on"; }
+        else { net.textContent = "offline"; net.className = "badge off"; }
+      };
+      window.addEventListener("online", setNet);
+      window.addEventListener("offline", setNet);
+      setNet();
+
+      // --- Init ---
+      renderModels();
+      renderAgents("b:generale");
+
+      // --- Service worker (offline) ---
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+      }
     </script>
   </body>
 </html>
