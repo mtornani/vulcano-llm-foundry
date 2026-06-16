@@ -83,23 +83,29 @@
     <div class="top">
       <button class="ic" id="btnLang" aria-label="language">🌐</button>
       <span class="sp"></span>
-      <span class="pill"><span class="dot"></span><span id="pillTxt"></span></span>
+      <span class="pill"><span class="dot"></span><span id="pillTxt">demo · on your device</span></span>
       <span class="sp"></span>
       <button class="ic" id="btnModel" aria-label="engine">⚡</button>
     </div>
 
     <div class="stepswrap">
-      <div class="hint" id="hint"></div>
-      <div class="steps" id="steps"></div>
+      <div class="hint" id="hint">tap the steps · type · press ▶</div>
+      <div class="steps" id="steps">
+        <button class="chip on" data-id="expand"><div class="disc" style="--c:#7ad1ff"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2.5"/><path d="M12 7V3M12 17v4M7 12H3M17 12h4"/></svg></div><div class="nm">Expand</div></button>
+        <button class="chip on" data-id="compress"><div class="disc" style="--c:#9ae6b4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2.5"/><path d="M5 5l3 3M19 5l-3 3M5 19l3-3M19 19l-3-3"/></svg></div><div class="nm">Shorten</div></button>
+        <button class="chip" data-id="translate"><div class="disc" style="--c:#ffd166"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><div class="nm">Translate</div></button>
+        <button class="chip" data-id="distill"><div class="disc" style="--c:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg></div><div class="nm">Key points</div></button>
+        <button class="chip on" data-id="refine"><div class="disc" style="--c:#ffd9a0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/></svg></div><div class="nm">Polish</div></button>
+      </div>
     </div>
 
     <div class="stage">
       <div class="status" id="status"></div>
-      <div class="out" id="out"></div>
+      <div class="out" id="out" data-empty="the answer appears here"></div>
     </div>
 
     <div class="composer">
-      <textarea id="signal" rows="1"></textarea>
+      <textarea id="signal" rows="1" placeholder="Write your message…"></textarea>
       <button class="play" id="run" aria-label="run"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
     </div>
 
