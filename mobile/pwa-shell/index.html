@@ -221,6 +221,18 @@
       }
 
       // ---------- model (WebLLM lazy) ----------
+      // Curated, on-device engines that actually exist in WebLLM's WebGPU catalog
+      // (Gemma + Qwen in evidence). Note: Gemma 4 / multimodal builds are native-only
+      // (MediaPipe/LiteRT/ExecuTorch) and cannot load via WebGPU here — newest Gemma in
+      // WebLLM is Gemma 3 1B. Ordered light → heavy. "Show all engines" reveals the rest.
+      const FEATURED = [
+        "Qwen3.5-0.8B-q4f16_1-MLC",   // default — newest tiny Qwen, runs on almost any phone
+        "gemma3-1b-it-q4f16_1-MLC",   // newest Gemma available in WebLLM
+        "Qwen3.5-2B-q4f16_1-MLC",
+        "gemma-2-2b-it-q4f16_1-MLC",  // most capable small Gemma (heavier)
+        "Qwen3.5-4B-q4f16_1-MLC",
+      ];
+      const DEFAULT_MODEL = "Qwen3.5-0.8B-q4f16_1-MLC";
       let webllm = null, listed = false, modelOn = false, showAll = false, mode = "demo";
       let engine = null, loadedModel = null;
       async function importWebLLM() { if (!webllm) webllm = await import("https://esm.run/@mlc-ai/web-llm"); return webllm; }
@@ -228,14 +240,17 @@
         const sel = $("model");
         try {
           const w = await importWebLLM();
-          const list = w.prebuiltAppConfig.model_list.filter((m) => showAll || m.low_resource_required)
-            .sort((a, b) => (a.vram_required_MB || 1e9) - (b.vram_required_MB || 1e9));
+          const all = w.prebuiltAppConfig.model_list;
+          const byId = (id) => all.find((m) => m.model_id === id);
+          const list = showAll
+            ? [...all].sort((a, b) => (a.vram_required_MB || 1e9) - (b.vram_required_MB || 1e9))
+            : FEATURED.map(byId).filter(Boolean);
           sel.innerHTML = "";
           for (const m of list) { const o = document.createElement("option");
             const gb = m.vram_required_MB ? ` · ~${(m.vram_required_MB / 1024).toFixed(1)} GB` : "";
             o.value = m.model_id; o.textContent = m.model_id + gb; sel.appendChild(o); }
-          const def = list.find((m) => /Qwen2\.5-1\.5B|Llama-3\.2-1B/.test(m.model_id)) || list[0];
-          if (def) sel.value = def.model_id; listed = true;
+          const def = byId(DEFAULT_MODEL) ? DEFAULT_MODEL : list[0]?.model_id;
+          if (def) sel.value = def; listed = true;
         } catch { sel.innerHTML = "<option>—</option>"; }
       }
       async function ensureModel() {
