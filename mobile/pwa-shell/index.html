@@ -6,313 +6,215 @@
     <meta name="theme-color" content="#0b0d12" />
     <link rel="manifest" href="public/manifest.json" />
     <link rel="apple-touch-icon" href="public/icons/icon-192.png" />
-    <title>◌ — flow of light</title>
+    <title>◌ flow</title>
     <style>
-      :root { --bg:#0b0d12; --bg2:#11141c; --ink:#f3f5fb; --dim:#9aa3b8; --line:#232838; --glass:rgba(255,255,255,.05); --accent:#cfe3ff; }
+      :root { --bg:#0b0d12; --bg2:#151823; --ink:#f3f5fb; --dim:#9aa3b8; --line:#2a3040; --glass:rgba(255,255,255,.06); --accent:#a9c6ff; }
       * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-      html, body { margin: 0; }
+      html, body { margin: 0; height: 100%; }
       body {
         font-family: system-ui, "Segoe UI", "Noto Sans", "Noto Sans Arabic", "Noto Sans SC", "Noto Sans Devanagari", Roboto, sans-serif;
-        background: radial-gradient(120% 80% at 50% 0%, #141a2a 0%, var(--bg) 60%, #06070b 100%);
-        color: var(--ink); display: flex; flex-direction: column; min-height: 100dvh;
+        background: radial-gradient(120% 70% at 50% 0%, #18203400 0%, var(--bg) 70%), var(--bg);
+        color: var(--ink); display: flex; flex-direction: column; height: 100dvh; overflow: hidden;
         padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
       }
       button { font: inherit; color: inherit; cursor: pointer; background: none; border: none; }
-      .iconbtn { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
-        background: var(--glass); border: 1px solid var(--line); }
-      .iconbtn svg, .node svg, .palette svg { width: 22px; height: 22px; }
-      .iconbtn:active { background: rgba(255,255,255,.14); }
 
-      .top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+      .top { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
       .top .sp { flex: 1; }
-      .brand { font-size: 12px; letter-spacing: .34em; color: var(--dim); text-transform: uppercase; }
+      .pill { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--dim);
+        border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px; }
+      .pill .dot { width: 8px; height: 8px; border-radius: 50%; background: #57e389; box-shadow: 0 0 8px #57e389; }
+      .ic { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-size: 19px;
+        background: var(--glass); border: 1px solid var(--line); }
+      .ic:active { background: rgba(255,255,255,.16); }
 
-      /* path */
-      .path { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 6px 16px 20px; gap: 0; }
-      .endcap { width: 100%; max-width: 420px; text-align: center; }
-      .endcap textarea { width: 100%; font: inherit; font-size: 16px; color: var(--ink); text-align: center;
-        background: var(--glass); border: 1px solid var(--line); border-radius: 16px; padding: 14px; resize: none; }
-      .endcap .out { min-height: 26px; font-size: 17px; line-height: 1.5; padding: 12px 8px; white-space: pre-wrap; }
-      .caplbl { font-size: 11px; letter-spacing: .18em; color: var(--dim); text-transform: uppercase; margin: 6px 0; }
+      /* STEPS — solid, high-contrast chips (always visible) */
+      .stepswrap { padding: 4px 8px 2px; }
+      .hint { text-align: center; font-size: 12px; color: var(--dim); margin: 0 0 8px; }
+      .steps { display: flex; gap: 14px; overflow-x: auto; padding: 6px 12px 14px; justify-content: center; scrollbar-width: none; }
+      .steps::-webkit-scrollbar { display: none; }
+      .chip { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 7px; width: 70px; opacity: .38; transition: opacity .2s, transform .2s; }
+      .chip.on { opacity: 1; }
+      .chip.run { transform: translateY(-4px) scale(1.06); }
+      .disc { width: 58px; height: 58px; border-radius: 50%; background: var(--c); display: grid; place-items: center;
+        box-shadow: 0 0 0 2px rgba(255,255,255,.08); }
+      .chip.on .disc { box-shadow: 0 0 22px -2px var(--c), 0 0 0 2px rgba(255,255,255,.25); }
+      .chip.run .disc { animation: bump .6s infinite; }
+      @keyframes bump { 50% { box-shadow: 0 0 34px 2px var(--c), 0 0 0 3px #fff; } }
+      .disc svg { width: 30px; height: 30px; color: #0b0d12; }
+      .chip .nm { font-size: 12px; color: var(--ink); text-align: center; line-height: 1.2; }
+      .chip .num { position: absolute; }
 
-      .link { width: 3px; height: 46px; position: relative; border-radius: 3px;
-        background: linear-gradient(180deg, rgba(207,227,255,.35), rgba(207,227,255,.08)); }
-      .link .pulse { position: absolute; left: 50%; top: 0; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%;
-        background: #fff; box-shadow: 0 0 14px 4px var(--c, #fff); opacity: 0; }
-      .link.flow .pulse { animation: travel .7s linear infinite; }
-      @keyframes travel { 0%{ top:-4px; opacity:0 } 15%{ opacity:1 } 85%{ opacity:1 } 100%{ top:46px; opacity:0 } }
+      /* MIDDLE — answer */
+      .stage { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 4px 18px; }
+      .out { flex: 1; min-height: 0; overflow-y: auto; font-size: 19px; line-height: 1.55; padding: 10px 0; white-space: pre-wrap; }
+      .out:empty::before { content: attr(data-empty); color: var(--dim); font-size: 15px; }
+      .status { text-align: center; font-size: 12px; color: var(--accent); min-height: 16px; padding-bottom: 6px; }
 
-      .node { width: 92px; height: 92px; border-radius: 50%; position: relative; display: grid; place-items: center;
-        background: radial-gradient(circle at 50% 38%, rgba(255,255,255,.10), rgba(255,255,255,.02) 70%);
-        border: 1px solid var(--line); transition: transform .25s, box-shadow .35s; }
-      .node .ring { position: absolute; inset: -3px; border-radius: 50%; border: 2px solid transparent; }
-      .node .glyph { color: var(--c, #cfe3ff); filter: drop-shadow(0 0 6px var(--c, #cfe3ff)); }
-      .node.active { transform: scale(1.12); box-shadow: 0 0 34px 6px var(--c, #cfe3ff); }
-      .node.done { box-shadow: 0 0 16px 1px var(--c, #cfe3ff); }
-      .node.byp { opacity: .35; filter: grayscale(.7); }
-      .node.err { box-shadow: 0 0 22px 3px #ff6b6b; }
-      .node .read { display: none; }
-      .nodewrap { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-      .nodelbl { font-size: 12px; color: var(--dim); letter-spacing: .02em; max-width: 120px; text-align: center; }
-      .addnode { width: 44px; height: 44px; border-radius: 50%; border: 1px dashed var(--line); color: var(--dim);
-        display: grid; place-items: center; font-size: 22px; background: transparent; }
+      /* BOTTOM — input + play */
+      .composer { display: flex; gap: 10px; align-items: center; padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line); background: var(--bg2); }
+      .composer textarea { flex: 1; min-width: 0; font: inherit; font-size: 16px; color: var(--ink); resize: none;
+        background: var(--glass); border: 1px solid var(--line); border-radius: 22px; padding: 13px 16px; max-height: 120px; }
+      .play { width: 56px; height: 56px; flex: 0 0 auto; border-radius: 50%; display: grid; place-items: center;
+        background: linear-gradient(180deg, #e9f1ff, #a9c6ff); color: #0b0d12; box-shadow: 0 4px 18px rgba(169,198,255,.4); }
+      .play:disabled { filter: grayscale(.5) brightness(.85); }
+      .play svg { width: 24px; height: 24px; }
 
-      .runbar { position: sticky; bottom: 0; display: flex; justify-content: center; padding: 12px;
-        background: linear-gradient(180deg, transparent, var(--bg) 40%); }
-      .runbtn { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(180deg, #e9f1ff, #a9c6ff);
-        color: #0b0d12; display: grid; place-items: center; box-shadow: 0 6px 22px rgba(169,198,255,.35); }
-      .runbtn:disabled { filter: grayscale(.5) brightness(.8); }
-      .runbtn svg { width: 26px; height: 26px; }
-      #prog { text-align: center; font-size: 12px; color: var(--accent); min-height: 16px; }
-
+      /* sheets */
       .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 9; display: none; }
       .scrim.open { display: block; }
       .sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; transform: translateY(100%); transition: transform .25s;
         background: var(--bg2); border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; padding: 16px;
-        padding-bottom: calc(20px + env(safe-area-inset-bottom)); max-height: 84dvh; overflow-y: auto; }
+        padding-bottom: calc(20px + env(safe-area-inset-bottom)); max-height: 80dvh; overflow-y: auto; }
       .sheet.open { transform: translateY(0); }
-      .sheet h3 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin: 2px 0 14px; font-weight: 600; }
+      .sheet h3 { font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin: 2px 0 14px; }
       .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px,1fr)); gap: 10px; }
-      .pick { border: 1px solid var(--line); border-radius: 14px; padding: 14px 8px; background: var(--glass);
-        display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; text-align: center; color: var(--ink); }
-      .pick.on { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
-      .pick svg { width: 26px; height: 26px; }
-      label { display: block; font-size: 12px; color: var(--dim); margin: 14px 0 8px; }
-      input[type=range] { width: 100%; accent-color: var(--accent); }
-      select { width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--glass);
-        border: 1px solid var(--line); border-radius: 10px; padding: 11px; }
-      select option { background: #11141c; }
+      .lang { border: 1px solid var(--line); border-radius: 12px; padding: 14px 8px; background: var(--glass); text-align: center; font-size: 15px; color: var(--ink); }
+      .lang.on { border-color: var(--accent); }
+      select { width: 100%; font: inherit; font-size: 15px; color: var(--ink); background: var(--glass); border: 1px solid var(--line); border-radius: 10px; padding: 11px; }
+      select option { background: #151823; }
       .btn { width: 100%; border: 1px solid var(--line); border-radius: 12px; padding: 13px; background: var(--glass); margin-top: 12px; }
       .btn.primary { background: linear-gradient(180deg, #e9f1ff, #a9c6ff); color: #0b0d12; border: none; font-weight: 600; }
-      .row { display: flex; gap: 10px; } .row > * { flex: 1; }
       .muted { font-size: 12px; color: var(--dim); margin-top: 12px; line-height: 1.55; text-align: center; }
     </style>
   </head>
   <body>
     <div class="top">
-      <button class="iconbtn" id="btnLang" aria-label="language">🌐</button>
+      <button class="ic" id="btnLang" aria-label="language">🌐</button>
       <span class="sp"></span>
-      <span class="brand" id="brand">vulcano · flow</span>
+      <span class="pill"><span class="dot"></span><span id="pillTxt"></span></span>
       <span class="sp"></span>
-      <button class="iconbtn" id="btnModel" aria-label="model">⚡</button>
-      <button class="iconbtn" id="btnNew" aria-label="reset">↺</button>
+      <button class="ic" id="btnModel" aria-label="engine">⚡</button>
     </div>
 
-    <div class="path" id="path">
-      <div class="endcap">
-        <div class="caplbl" id="lbl_in"></div>
-        <textarea id="signal" rows="2"></textarea>
-      </div>
-      <div id="chainHost"></div>
-      <div class="endcap" style="margin-top:6px">
-        <div class="caplbl" id="lbl_out"></div>
-        <div class="out" id="finalOut"></div>
-      </div>
+    <div class="stepswrap">
+      <div class="hint" id="hint"></div>
+      <div class="steps" id="steps"></div>
     </div>
 
-    <div id="prog"></div>
-    <div class="runbar">
-      <button class="runbtn" id="runBtn" aria-label="run">
-        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-      </button>
+    <div class="stage">
+      <div class="status" id="status"></div>
+      <div class="out" id="out"></div>
+    </div>
+
+    <div class="composer">
+      <textarea id="signal" rows="1"></textarea>
+      <button class="play" id="run" aria-label="run"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
     </div>
 
     <div class="scrim" id="scrim"></div>
-
-    <!-- language -->
     <div class="sheet" id="sheetLang"><h3 id="t_language"></h3><div class="grid" id="langGrid"></div></div>
-
-    <!-- add node -->
-    <div class="sheet" id="sheetAdd"><h3 id="t_add"></h3><div class="grid palette" id="palette"></div></div>
-
-    <!-- node config -->
-    <div class="sheet" id="sheetNode">
-      <h3 id="nodeTitle"></h3>
-      <label id="t_intensity"></label>
-      <input type="range" id="intensity" min="0" max="150" />
-      <button class="btn" id="bypBtn"></button>
-      <div class="row"><button class="btn" id="upBtn">▲</button><button class="btn" id="downBtn">▼</button></div>
-      <button class="btn" id="delBtn"></button>
-    </div>
-
-    <!-- model -->
     <div class="sheet" id="sheetModel">
       <h3 id="t_model"></h3>
       <select id="model"><option>—</option></select>
       <button class="btn" id="showAll"></button>
       <button class="btn primary" id="load"></button>
       <div class="muted" id="prog2"></div>
-      <div class="muted" id="t_modelnote"></div>
+      <div class="muted" id="t_note"></div>
     </div>
 
     <script type="module">
       const $ = (id) => document.getElementById(id);
       const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-      // universal geometric pictograms (no words, no cultural symbols)
+      // universal geometric pictograms (dark glyph on bright disc)
       const ICON = {
-        expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2.5"/><path d="M12 7V3M12 17v4M7 12H3M17 12h4"/><path d="M6 6l2 2M18 6l-2 2M6 18l2-2M18 18l-2-2"/></svg>',
-        compress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="2.5"/><path d="M4 4l4 4M20 4l-4 4M4 20l4-4M20 20l-4-4"/></svg>',
-        translate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>',
-        filter: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg>',
-        refine: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/></svg>',
-        critique: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>',
+        expand: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2.5"/><path d="M12 7V3M12 17v4M7 12H3M17 12h4"/></svg>',
+        compress: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="2.5"/><path d="M5 5l3 3M19 5l-3 3M5 19l3-3M19 19l-3-3"/></svg>',
+        translate: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>',
+        distill: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16l-6 7v6l-4 2v-8z"/></svg>',
+        refine: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.2 6.8L21 12l-6.8 2.2L12 21l-2.2-6.8L3 12l6.8-2.2z"/></svg>',
       };
 
-      // ---------------- modules (pictogram-first; names per language) ----------------
       const MODS = {
-        expand: { icon: "expand", c: "#7ad1ff",
-          nm: { en:"Expand", es:"Expandir", ar:"توسيع", zh:"扩展", hi:"विस्तार", sw:"Panua", ru:"Расширить", fr:"Développer" },
-          system: "Expand and enrich the user's text with useful detail, same language. Output only the text.",
-          demo: (s) => s + " — " + s.toLowerCase() },
-        compress: { icon: "compress", c: "#9ae6b4",
-          nm: { en:"Condense", es:"Condensar", ar:"تكثيف", zh:"浓缩", hi:"संक्षेप", sw:"Fupisha", ru:"Сжать", fr:"Condenser" },
-          system: "Summarize the user's text in one essential sentence, same language. Only the summary.",
-          demo: (s) => s.split(/\s+/).slice(0, 8).join(" ") + "…" },
-        translate: { icon: "translate", c: "#ffd166",
-          nm: { en:"Translate", es:"Traducir", ar:"ترجمة", zh:"翻译", hi:"अनुवाद", sw:"Tafsiri", ru:"Перевести", fr:"Traduire" },
-          system: "Translate the user's text to English. Output only the translation.",
-          demo: (s) => "→ " + s },
-        filter: { icon: "filter", c: "#c4b5fd",
-          nm: { en:"Distill", es:"Destilar", ar:"تقطير", zh:"提炼", hi:"सार", sw:"Chuja", ru:"Выделить", fr:"Distiller" },
-          system: "Extract the key points as a very short bullet list, same language. Only the list.",
-          demo: (s) => "• " + s.split(/\s+/).filter((w) => w.length > 4).slice(0, 5).join("\n• ") },
-        refine: { icon: "refine", c: "#f0f4f8",
-          nm: { en:"Refine", es:"Pulir", ar:"تحسين", zh:"润色", hi:"परिष्कार", sw:"Boresha", ru:"Отшлифовать", fr:"Affiner" },
-          system: "Rewrite the text clearly and smoothly, same language. Only the text.",
-          demo: (s) => { s = s.trim(); return s.charAt(0).toUpperCase() + s.slice(1) + (/[.!?]$/.test(s) ? "" : "."); } },
-        critique: { icon: "critique", c: "#ffa94d",
-          nm: { en:"Critique", es:"Criticar", ar:"نقد", zh:"批评", hi:"समीक्षा", sw:"Tathmini", ru:"Критика", fr:"Critiquer" },
-          system: "List briefly the weaknesses or risks of the user's text, same language. Only the list.",
-          demo: (s) => "⚠ " + s.slice(0, 40) + "… (sim.)" },
+        expand:   { icon:"expand",   c:"#7ad1ff", nm:{ en:"Expand", es:"Ampliar", ar:"توسيع", zh:"扩展", hi:"विस्तार", sw:"Panua", ru:"Шире", fr:"Élargir" },
+          system:"Expand and enrich the user's text with useful detail, same language. Output only the text.",
+          demo:(s)=> s + " — " + s.toLowerCase() },
+        compress: { icon:"compress", c:"#9ae6b4", nm:{ en:"Shorten", es:"Acortar", ar:"اختصار", zh:"精简", hi:"संक्षेप", sw:"Fupisha", ru:"Короче", fr:"Abréger" },
+          system:"Summarize the user's text in one essential sentence, same language. Only the summary.",
+          demo:(s)=> s.split(/\s+/).slice(0,8).join(" ") + "…" },
+        translate:{ icon:"translate", c:"#ffd166", nm:{ en:"Translate", es:"Traducir", ar:"ترجمة", zh:"翻译", hi:"अनुवाद", sw:"Tafsiri", ru:"Перевод", fr:"Traduire" },
+          system:"Translate the user's text to English. Output only the translation.",
+          demo:(s)=> "→ " + s },
+        distill:  { icon:"distill",  c:"#c4b5fd", nm:{ en:"Key points", es:"Claves", ar:"النقاط", zh:"要点", hi:"मुख्य", sw:"Vidokezo", ru:"Тезисы", fr:"Points clés" },
+          system:"Extract the key points as a very short bullet list, same language. Only the list.",
+          demo:(s)=> "• " + s.split(/\s+/).filter((w)=>w.length>4).slice(0,5).join("\n• ") },
+        refine:   { icon:"refine",   c:"#ffd9a0", nm:{ en:"Polish", es:"Pulir", ar:"تحسين", zh:"润色", hi:"सुधार", sw:"Boresha", ru:"Чище", fr:"Affiner" },
+          system:"Rewrite the text clearly and smoothly, same language. Only the text.",
+          demo:(s)=> { s=s.trim(); return s.charAt(0).toUpperCase()+s.slice(1)+(/[.!?]$/.test(s)?"":"."); } },
       };
 
-      // ---------------- i18n ----------------
       const UI = {
-        en: { name:"English", bcp:"en-US", input:"your message", output:"result", language:"Language", add:"Add a step",
-          model:"Engine", intensity:"Imagination", bypass:"Skip this step", remove:"Remove step", showAll:"Show all engines",
-          power:"Power the engine", thinking:"…", ready:"ready", cold:"engine off — demo", tagline:"a flow of light, on your device",
-          note:"Needs WebGPU. The lightest engine runs on any phone. Downloads once, then offline." },
-        es: { name:"Español", bcp:"es-ES", input:"tu mensaje", output:"resultado", language:"Idioma", add:"Añadir un paso",
-          model:"Motor", intensity:"Imaginación", bypass:"Saltar este paso", remove:"Quitar paso", showAll:"Mostrar todos los motores",
-          power:"Encender el motor", thinking:"…", ready:"listo", cold:"motor apagado — demo", tagline:"un flujo de luz, en tu dispositivo",
-          note:"Requiere WebGPU. El motor más ligero funciona en cualquier móvil. Se descarga una vez y luego sin conexión." },
-        ar: { name:"العربية", bcp:"ar-SA", rtl:true, input:"رسالتك", output:"النتيجة", language:"اللغة", add:"أضف خطوة",
-          model:"المحرك", intensity:"الخيال", bypass:"تخطّ هذه الخطوة", remove:"إزالة الخطوة", showAll:"عرض كل المحركات",
-          power:"تشغيل المحرك", thinking:"…", ready:"جاهز", cold:"المحرك متوقف — عرض", tagline:"تدفّق من الضوء، على جهازك",
-          note:"يتطلب WebGPU. أخف محرك يعمل على أي هاتف. يُحمَّل مرة واحدة ثم دون اتصال." },
-        zh: { name:"中文", bcp:"zh-CN", input:"你的消息", output:"结果", language:"语言", add:"添加步骤",
-          model:"引擎", intensity:"想象力", bypass:"跳过此步", remove:"移除步骤", showAll:"显示全部引擎",
-          power:"启动引擎", thinking:"…", ready:"就绪", cold:"引擎关闭 — 演示", tagline:"一束流动的光，在你的设备上",
-          note:"需要 WebGPU。最轻引擎可在任何手机运行。仅下载一次，之后离线。" },
-        hi: { name:"हिन्दी", bcp:"hi-IN", input:"आपका संदेश", output:"परिणाम", language:"भाषा", add:"चरण जोड़ें",
-          model:"इंजन", intensity:"कल्पना", bypass:"यह चरण छोड़ें", remove:"चरण हटाएँ", showAll:"सभी इंजन दिखाएँ",
-          power:"इंजन चालू करें", thinking:"…", ready:"तैयार", cold:"इंजन बंद — डेमो", tagline:"प्रकाश का प्रवाह, आपके डिवाइस पर",
-          note:"WebGPU चाहिए। सबसे हल्का इंजन किसी भी फ़ोन पर चलता है। एक बार डाउनलोड, फिर ऑफ़लाइन।" },
-        sw: { name:"Kiswahili", bcp:"sw-KE", input:"ujumbe wako", output:"matokeo", language:"Lugha", add:"Ongeza hatua",
-          model:"Injini", intensity:"Ubunifu", bypass:"Ruka hatua hii", remove:"Ondoa hatua", showAll:"Onyesha injini zote",
-          power:"Washa injini", thinking:"…", ready:"tayari", cold:"injini imezimwa — onyesho", tagline:"mtiririko wa nuru, kwenye kifaa chako",
-          note:"Inahitaji WebGPU. Injini nyepesi hufanya kazi kwenye simu yoyote. Hupakuliwa mara moja, kisha nje ya mtandao." },
-        ru: { name:"Русский", bcp:"ru-RU", input:"ваше сообщение", output:"результат", language:"Язык", add:"Добавить шаг",
-          model:"Движок", intensity:"Воображение", bypass:"Пропустить шаг", remove:"Удалить шаг", showAll:"Все движки",
-          power:"Запустить движок", thinking:"…", ready:"готово", cold:"движок выключен — демо", tagline:"поток света на вашем устройстве",
-          note:"Нужен WebGPU. Самый лёгкий движок работает на любом телефоне. Загрузка один раз, потом офлайн." },
-        fr: { name:"Français", bcp:"fr-FR", input:"votre message", output:"résultat", language:"Langue", add:"Ajouter une étape",
-          model:"Moteur", intensity:"Imagination", bypass:"Sauter cette étape", remove:"Retirer l’étape", showAll:"Tous les moteurs",
-          power:"Démarrer le moteur", thinking:"…", ready:"prêt", cold:"moteur éteint — démo", tagline:"un flux de lumière, sur votre appareil",
-          note:"Nécessite WebGPU. Le moteur le plus léger fonctionne sur tout téléphone. Téléchargé une fois, puis hors ligne." },
+        en:{ name:"English", bcp:"en-US", ph:"Write your message…", empty:"the answer appears here", hint:"tap the steps · type · press ▶",
+          language:"Language", model:"Engine", showAll:"Show all engines", power:"Power the engine", ondevice:"on your device",
+          ready:"ready", demo:"demo", note:"Needs WebGPU. The lightest engine runs on any phone. Downloads once, then offline." },
+        es:{ name:"Español", bcp:"es-ES", ph:"Escribe tu mensaje…", empty:"la respuesta aparece aquí", hint:"toca los pasos · escribe · pulsa ▶",
+          language:"Idioma", model:"Motor", showAll:"Ver todos los motores", power:"Encender el motor", ondevice:"en tu dispositivo",
+          ready:"listo", demo:"demo", note:"Requiere WebGPU. El motor más ligero funciona en cualquier móvil. Se descarga una vez y luego sin conexión." },
+        ar:{ name:"العربية", bcp:"ar-SA", rtl:true, ph:"اكتب رسالتك…", empty:"تظهر الإجابة هنا", hint:"المس الخطوات · اكتب · اضغط ▶",
+          language:"اللغة", model:"المحرك", showAll:"كل المحركات", power:"تشغيل المحرك", ondevice:"على جهازك",
+          ready:"جاهز", demo:"عرض", note:"يتطلب WebGPU. أخف محرك يعمل على أي هاتف. يُحمَّل مرة واحدة ثم دون اتصال." },
+        zh:{ name:"中文", bcp:"zh-CN", ph:"写下你的消息…", empty:"答案出现在这里", hint:"点选步骤 · 输入 · 按 ▶",
+          language:"语言", model:"引擎", showAll:"显示全部引擎", power:"启动引擎", ondevice:"在你的设备上",
+          ready:"就绪", demo:"演示", note:"需要 WebGPU。最轻引擎可在任何手机运行。仅下载一次，之后离线。" },
+        hi:{ name:"हिन्दी", bcp:"hi-IN", ph:"अपना संदेश लिखें…", empty:"उत्तर यहाँ दिखेगा", hint:"चरण चुनें · लिखें · ▶ दबाएँ",
+          language:"भाषा", model:"इंजन", showAll:"सभी इंजन", power:"इंजन चालू करें", ondevice:"आपके डिवाइस पर",
+          ready:"तैयार", demo:"डेमो", note:"WebGPU चाहिए। सबसे हल्का इंजन किसी भी फ़ोन पर चलता है। एक बार डाउनलोड, फिर ऑफ़लाइन।" },
+        sw:{ name:"Kiswahili", bcp:"sw-KE", ph:"Andika ujumbe wako…", empty:"jibu litaonekana hapa", hint:"gusa hatua · andika · bonyeza ▶",
+          language:"Lugha", model:"Injini", showAll:"Onyesha injini zote", power:"Washa injini", ondevice:"kwenye kifaa chako",
+          ready:"tayari", demo:"onyesho", note:"Inahitaji WebGPU. Injini nyepesi hufanya kazi kwenye simu yoyote. Hupakuliwa mara moja, kisha nje ya mtandao." },
+        ru:{ name:"Русский", bcp:"ru-RU", ph:"Напишите сообщение…", empty:"ответ появится здесь", hint:"выберите шаги · напишите · нажмите ▶",
+          language:"Язык", model:"Движок", showAll:"Все движки", power:"Запустить движок", ondevice:"на вашем устройстве",
+          ready:"готово", demo:"демо", note:"Нужен WebGPU. Самый лёгкий движок работает на любом телефоне. Загрузка один раз, потом офлайн." },
+        fr:{ name:"Français", bcp:"fr-FR", ph:"Écrivez votre message…", empty:"la réponse apparaît ici", hint:"touchez les étapes · écrivez · appuyez ▶",
+          language:"Langue", model:"Moteur", showAll:"Tous les moteurs", power:"Démarrer le moteur", ondevice:"sur votre appareil",
+          ready:"prêt", demo:"démo", note:"Nécessite WebGPU. Le moteur le plus léger fonctionne sur tout téléphone. Téléchargé une fois, puis hors ligne." },
       };
-      let lang = localStorage.getItem("vulcano.lang") || (navigator.language || "en").slice(0, 2);
+      let lang = localStorage.getItem("vulcano.lang") || (navigator.language || "en").slice(0,2);
       if (!UI[lang]) lang = "en";
       const L = () => UI[lang];
       const modName = (id) => MODS[id].nm[lang] || MODS[id].nm.en;
 
+      // active steps (the pipeline), in fixed left→right order
+      const ORDER = Object.keys(MODS);
+      let active = JSON.parse(localStorage.getItem("vulcano.steps") || "null") || ["expand","compress","refine"];
+      const saveSteps = () => localStorage.setItem("vulcano.steps", JSON.stringify(active));
+
+      function renderSteps() {
+        const host = $("steps"); host.innerHTML = "";
+        ORDER.forEach((id) => {
+          const mod = MODS[id];
+          const chip = document.createElement("button");
+          chip.className = "chip" + (active.includes(id) ? " on" : "");
+          chip.dataset.id = id;
+          chip.innerHTML = `<div class="disc" style="--c:${mod.c}">${ICON[mod.icon]}</div><div class="nm">${modName(id)}</div>`;
+          chip.onclick = () => {
+            if (active.includes(id)) active = active.filter((x) => x !== id);
+            else active = ORDER.filter((x) => active.includes(x) || x === id); // keep canonical order
+            saveSteps(); renderSteps();
+          };
+          host.appendChild(chip);
+        });
+      }
+
       function applyLang() {
         document.documentElement.lang = lang;
         document.documentElement.dir = L().rtl ? "rtl" : "ltr";
-        $("signal").placeholder = L().input;
-        $("lbl_in").textContent = L().input;
-        $("lbl_out").textContent = L().output;
-        $("brand").textContent = L().tagline;
+        $("signal").placeholder = L().ph;
+        $("out").dataset.empty = L().empty;
+        $("hint").textContent = L().hint;
+        $("pillTxt").textContent = (modelOn ? L().ready : L().demo) + " · " + L().ondevice;
         $("t_language").textContent = L().language;
-        $("t_add").textContent = L().add;
         $("t_model").textContent = L().model;
-        $("t_intensity").textContent = L().intensity;
-        $("t_modelnote").textContent = L().note;
+        $("t_note").textContent = L().note;
         $("showAll").textContent = L().showAll;
         $("load").textContent = L().power;
-        $("bypBtn").textContent = L().bypass;
-        $("delBtn").textContent = L().remove;
-        if (!modelOn) $("prog").textContent = L().cold;
         localStorage.setItem("vulcano.lang", lang);
+        renderSteps();
       }
 
-      // ---------------- chain ----------------
-      let uidc = 0; const uid = () => "n" + (++uidc);
-      let chain = [
-        { uid: uid(), type: "expand", temp: 70, bypass: false },
-        { uid: uid(), type: "compress", temp: 40, bypass: false },
-        { uid: uid(), type: "refine", temp: 30, bypass: false },
-      ];
-      let editIdx = -1;
-
-      function render() {
-        const host = $("chainHost"); host.innerHTML = "";
-        chain.forEach((n, i) => {
-          const mod = MODS[n.type];
-          const link = document.createElement("div"); link.className = "link"; link.style.setProperty("--c", mod.c);
-          link.innerHTML = '<span class="pulse"></span>'; host.appendChild(link);
-          const wrap = document.createElement("div"); wrap.className = "nodewrap";
-          wrap.innerHTML = `
-            <div class="node ${n.bypass ? "byp" : ""}" data-uid="${n.uid}" style="--c:${mod.c}">
-              <span class="glyph">${ICON[mod.icon]}</span>
-            </div>
-            <div class="nodelbl">${modName(n.type)}</div>`;
-          host.appendChild(wrap);
-          wrap.querySelector(".node").onclick = () => openNode(i);
-        });
-        // add-step button at the end
-        const link = document.createElement("div"); link.className = "link"; host.appendChild(link);
-        const addWrap = document.createElement("div"); addWrap.className = "nodewrap";
-        const add = document.createElement("button"); add.className = "addnode"; add.textContent = "＋";
-        add.onclick = () => { renderPalette(); openSheet("sheetAdd"); };
-        addWrap.appendChild(add); host.appendChild(addWrap);
-      }
-
-      function openNode(i) {
-        editIdx = i; const n = chain[i];
-        $("nodeTitle").textContent = modName(n.type);
-        $("intensity").value = n.temp;
-        $("bypBtn").style.color = n.bypass ? "var(--accent)" : "";
-        openSheet("sheetNode");
-      }
-      $("intensity").oninput = () => { if (editIdx >= 0) chain[editIdx].temp = +$("intensity").value; };
-      $("bypBtn").onclick = () => { if (editIdx < 0) return; chain[editIdx].bypass = !chain[editIdx].bypass; $("bypBtn").style.color = chain[editIdx].bypass ? "var(--accent)" : ""; render(); };
-      $("upBtn").onclick = () => { if (editIdx > 0) { [chain[editIdx - 1], chain[editIdx]] = [chain[editIdx], chain[editIdx - 1]]; editIdx--; render(); } };
-      $("downBtn").onclick = () => { if (editIdx >= 0 && editIdx < chain.length - 1) { [chain[editIdx + 1], chain[editIdx]] = [chain[editIdx], chain[editIdx + 1]]; editIdx++; render(); } };
-      $("delBtn").onclick = () => { if (editIdx >= 0) { chain.splice(editIdx, 1); closeSheets(); render(); } };
-
-      function renderPalette() {
-        const p = $("palette"); p.innerHTML = "";
-        for (const [id, mod] of Object.entries(MODS)) {
-          const b = document.createElement("button"); b.className = "pick";
-          b.innerHTML = `<span style="color:${mod.c}">${ICON[mod.icon]}</span><span>${modName(id)}</span>`;
-          b.onclick = () => { chain.push({ uid: uid(), type: id, temp: 60, bypass: false }); closeSheets(); render(); };
-          p.appendChild(b);
-        }
-      }
-      function renderLangs() {
-        const g = $("langGrid"); g.innerHTML = "";
-        for (const code of Object.keys(UI)) {
-          const b = document.createElement("button"); b.className = "pick" + (code === lang ? " on" : "");
-          b.innerHTML = `<span>${UI[code].name}</span>`;
-          b.onclick = () => { lang = code; applyLang(); render(); closeSheets(); };
-          g.appendChild(b);
-        }
-      }
-
-      // ---------------- model (WebLLM lazy) ----------------
+      // ---------- model (WebLLM lazy) ----------
       let webllm = null, listed = false, modelOn = false, showAll = false, mode = "demo";
       let engine = null, loadedModel = null;
       async function importWebLLM() { if (!webllm) webllm = await import("https://esm.run/@mlc-ai/web-llm"); return webllm; }
@@ -335,70 +237,72 @@
         const id = $("model").value; if (!id || id === "—") throw new Error("model");
         if (engine && loadedModel === id) return engine;
         const w = await importWebLLM();
-        const cb = (r) => { $("prog2").textContent = `${(r.progress || 0) * 100 | 0}% · ${r.text}`; $("prog").textContent = `${(r.progress || 0) * 100 | 0}%`; };
+        const cb = (r) => { $("prog2").textContent = `${(r.progress || 0) * 100 | 0}% · ${r.text}`; $("status").textContent = `${(r.progress || 0) * 100 | 0}%`; };
         if (!engine) engine = await w.CreateMLCEngine(id, { initProgressCallback: cb });
         else await engine.reload(id);
-        loadedModel = id; modelOn = true; mode = "local";
-        $("prog2").textContent = L().ready + " · " + id; $("prog").textContent = L().ready;
+        loadedModel = id; modelOn = true; mode = "local"; applyLang();
+        $("prog2").textContent = L().ready + " · " + id;
         return engine;
       }
-      async function processNode(n, input, onChunk) {
-        const mod = MODS[n.type];
+      async function processStep(id, input) {
+        const mod = MODS[id];
         if (mode === "local") {
           const eng = await ensureModel();
-          const stream = await eng.chat.completions.create({
-            messages: [{ role: "system", content: mod.system }, { role: "user", content: input }],
-            stream: true, temperature: n.temp / 100 });
-          let acc = "";
-          for await (const c of stream) { const d = c.choices?.[0]?.delta?.content || ""; if (d) { acc += d; onChunk(acc); } }
-          return acc.trim();
-        } else {
-          const out = String(mod.demo(input)); await sleep(450); onChunk(out); return out;
+          const r = await eng.chat.completions.create({
+            messages: [{ role: "system", content: mod.system }, { role: "user", content: input }], temperature: 0.6 });
+          return (r.choices?.[0]?.message?.content || "").trim();
         }
+        await sleep(420); return String(mod.demo(input));
       }
 
-      // ---------------- run: pulse travels the path ----------------
+      // ---------- run ----------
       let busy = false;
       const isRTL = (s) => /[֐-׿؀-ۿ]/.test((s || "").trim()[0] || "");
       async function run() {
         if (busy) return;
-        const input = $("signal").value.trim(); if (!input) return;
-        busy = true; $("runBtn").disabled = true; $("finalOut").textContent = "";
-        const host = $("chainHost");
-        const links = [...host.querySelectorAll(".link")];
-        const nodes = [...host.querySelectorAll(".node")];
-        nodes.forEach((nd) => nd.classList.remove("active", "done", "err"));
+        const input = $("signal").value.trim();
+        if (!input) { $("signal").focus(); return; }
+        const steps = ORDER.filter((id) => active.includes(id));
+        if (!steps.length) { $("status").textContent = "•••"; return; }
+        busy = true; $("run").disabled = true; $("out").textContent = "";
         let sig = input;
-        for (let i = 0; i < chain.length; i++) {
-          const n = chain[i], nd = nodes[i], link = links[i];
-          if (n.bypass) continue;
-          if (link) link.classList.add("flow");
-          nd.classList.add("active");
-          $("prog").textContent = modName(n.type) + " " + L().thinking;
-          try { sig = await processNode(n, sig, (acc) => { $("finalOut").textContent = acc; $("finalOut").dir = isRTL(acc) ? "rtl" : "ltr"; }); }
-          catch (e) { nd.classList.remove("active"); nd.classList.add("err"); if (link) link.classList.remove("flow"); $("prog").textContent = "⚠ " + (e?.message || e); busy = false; $("runBtn").disabled = false; return; }
-          if (link) link.classList.remove("flow");
-          nd.classList.remove("active"); nd.classList.add("done");
+        for (const id of steps) {
+          const chip = $("steps").querySelector(`[data-id="${id}"]`);
+          chip && chip.classList.add("run");
+          $("status").textContent = modName(id) + " …";
+          try { sig = await processStep(id, sig); }
+          catch (e) { $("status").textContent = "⚠ " + (e?.message || e); chip && chip.classList.remove("run"); busy = false; $("run").disabled = false; return; }
+          chip && chip.classList.remove("run");
+          $("out").textContent = sig; $("out").dir = isRTL(sig) ? "rtl" : "ltr";
         }
-        $("finalOut").textContent = sig; $("finalOut").dir = isRTL(sig) ? "rtl" : "ltr";
-        $("prog").textContent = "✓";
-        busy = false; $("runBtn").disabled = false;
+        $("status").textContent = "✓";
+        busy = false; $("run").disabled = false;
       }
 
-      // ---------------- sheets ----------------
-      const sheets = ["sheetLang", "sheetAdd", "sheetNode", "sheetModel"];
+      // ---------- sheets ----------
+      const sheets = ["sheetLang", "sheetModel"];
       function closeSheets() { sheets.forEach((s) => $(s).classList.remove("open")); $("scrim").classList.remove("open"); }
       function openSheet(id) { closeSheets(); $(id).classList.add("open"); $("scrim").classList.add("open"); }
+      function renderLangs() {
+        const g = $("langGrid"); g.innerHTML = "";
+        for (const code of Object.keys(UI)) {
+          const b = document.createElement("button"); b.className = "lang" + (code === lang ? " on" : "");
+          b.textContent = UI[code].name;
+          b.onclick = () => { lang = code; applyLang(); closeSheets(); };
+          g.appendChild(b);
+        }
+      }
       $("scrim").onclick = closeSheets;
       $("btnLang").onclick = () => { renderLangs(); openSheet("sheetLang"); };
       $("btnModel").onclick = async () => { openSheet("sheetModel"); if (!listed) await listModels(); };
-      $("btnNew").onclick = () => { $("signal").value = ""; $("finalOut").textContent = ""; render(); };
       $("load").onclick = () => ensureModel().catch((e) => { $("prog2").textContent = "⚠ " + (e?.message || e); });
       $("showAll").onclick = async () => { showAll = !showAll; listed = false; await listModels(); };
-      $("runBtn").onclick = run;
+      $("run").onclick = run;
+      $("signal").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); run(); } });
+      $("signal").addEventListener("input", (e) => { const t = e.target; t.style.height = "auto"; t.style.height = Math.min(t.scrollHeight, 120) + "px"; t.dir = isRTL(t.value) ? "rtl" : "ltr"; });
 
-      // ---------------- init ----------------
-      applyLang(); render();
+      // ---------- init ----------
+      applyLang();
       if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
         addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
     </script>
