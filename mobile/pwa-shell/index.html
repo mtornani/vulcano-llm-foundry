@@ -1,177 +1,149 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#120704" />
+    <meta name="theme-color" content="#0b0d12" />
     <link rel="manifest" href="public/manifest.json" />
     <link rel="apple-touch-icon" href="public/icons/icon-192.png" />
-    <title>LA FUCINA • Vulcano</title>
+    <title>◌ — AI for everyone, on your device</title>
     <style>
       :root {
-        --bg: #120704; --bg2: #1e0d06; --ash: #2a160c;
-        --ember: #ff5a1f; --molten: #ffb347; --white-hot: #fff3d6; --gold: #ffd23f;
-        --text: #f3d8b8; --dim: #a9764f; --line: #43210f;
+        --bg: #0b0d12; --bg2: #11141c; --ink: #f3f5fb; --dim: #9aa3b8; --line: #232838;
+        --glass: rgba(255,255,255,.04); --accent: #cfe3ff;
       }
-      * { box-sizing: border-box; }
-      html, body { margin: 0; min-height: 100%; }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+      html, body { margin: 0; height: 100%; }
       body {
-        font-family: "Iowan Old Style", Georgia, "Times New Roman", serif;
-        background: radial-gradient(140% 100% at 50% -10%, #3a1606 0%, var(--bg) 55%, #080302 100%);
-        color: var(--text); -webkit-font-smoothing: antialiased;
+        font-family: system-ui, "Segoe UI", "Noto Sans", "Noto Sans Arabic", "Noto Sans CJK SC", "Noto Sans Devanagari", Roboto, sans-serif;
+        background: radial-gradient(120% 80% at 50% 0%, #141a2a 0%, var(--bg) 60%, #06070b 100%);
+        color: var(--ink); display: flex; flex-direction: column; height: 100dvh; overflow: hidden;
         padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
       }
-      #embers { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
-      .wrap { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; padding: 14px 16px 32px; }
-
-      header.brand { text-align: center; margin-bottom: 14px; }
-      header.brand .mark { font-size: 12px; letter-spacing: .5em; color: var(--ember); text-transform: uppercase; }
-      header.brand h1 { margin: 2px 0 0; font-size: 30px; letter-spacing: .08em; font-weight: 600;
-        background: linear-gradient(180deg, var(--white-hot), var(--molten) 55%, var(--ember));
-        -webkit-background-clip: text; background-clip: text; color: transparent;
-        text-shadow: 0 0 22px rgba(255,90,31,.25); }
-      header.brand .sub { font-size: 12px; color: var(--dim); letter-spacing: .12em; }
-
-      .panel { border: 1px solid var(--line); border-radius: 4px; background: linear-gradient(180deg, rgba(42,22,12,.55), rgba(18,7,4,.55));
-        padding: 16px; margin-bottom: 16px; box-shadow: inset 0 1px 0 rgba(255,180,90,.05); }
-      .kicker { font-size: 11px; letter-spacing: .34em; color: var(--ember); text-transform: uppercase; margin: 0 0 12px; }
-
-      /* ---------- IL CROGIOLO ---------- */
-      .forge { display: flex; gap: 16px; align-items: center; }
-      .crucible {
-        --heat: 0.08; flex: 0 0 96px; width: 96px; height: 96px; border-radius: 0 0 48px 48px / 0 0 60px 60px;
-        position: relative; border: 2px solid #5a2c12; border-top: none;
-        background:
-          radial-gradient(60% 60% at 50% 30%, rgba(255,243,214,calc(var(--heat))) 0%, rgba(255,90,31,calc(var(--heat)*0.9)) 35%, rgba(60,20,8,.9) 75%),
-          linear-gradient(180deg, #2a160c, #160a05);
-        box-shadow: 0 0 calc(8px + var(--heat)*60px) rgba(255,90,31,calc(.2 + var(--heat)*.8)),
-                    inset 0 6px 14px rgba(255,180,90,calc(var(--heat)*.7));
-        transition: box-shadow .4s, background .4s;
+      button { font: inherit; color: inherit; cursor: pointer; background: none; border: none; }
+      .iconbtn {
+        width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 20px;
+        background: var(--glass); border: 1px solid var(--line); color: var(--ink);
       }
-      .crucible::before { content: ""; position: absolute; left: 14px; right: 14px; top: -7px; height: 12px; border-radius: 50%;
-        background: radial-gradient(closest-side, rgba(255,243,214,calc(var(--heat))) 0%, rgba(255,90,31,calc(var(--heat)*.7)) 60%, transparent 100%);
-        filter: blur(1px); }
-      .forge .ctl { flex: 1; min-width: 0; }
-      label { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin: 12px 0 5px; }
-      label:first-child { margin-top: 0; }
-      select, input[type=text], textarea, button {
-        font-family: inherit; font-size: 15px; color: var(--text); width: 100%;
-        background: rgba(10,4,2,.55); border: 1px solid var(--line); border-radius: 3px; padding: 11px;
+      .iconbtn:active { background: rgba(255,255,255,.12); }
+
+      /* top bar */
+      .top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+      .top .sp { flex: 1; }
+      .brand { font-size: 13px; letter-spacing: .35em; color: var(--dim); text-transform: uppercase; }
+
+      /* orb stage */
+      .stage { flex: 1; position: relative; display: grid; place-items: center; min-height: 0; }
+      #orb { width: min(70vw, 300px); height: min(70vw, 300px); display: block; }
+      .tagline { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 13px; color: var(--dim); padding: 0 24px; }
+
+      /* response */
+      .out { max-height: 30vh; overflow-y: auto; padding: 4px 18px; }
+      .turn { margin: 8px 0; line-height: 1.55; }
+      .turn.you { color: var(--dim); font-size: 14px; }
+      .turn.you::before { content: "•"; margin-inline-end: 8px; color: var(--accent); }
+      .turn.ai { font-size: 17px; }
+      .turn.note { color: var(--dim); font-size: 13px; text-align: center; }
+
+      /* composer */
+      .composer { display: flex; align-items: center; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line); background: var(--bg2); }
+      .composer input {
+        flex: 1; min-width: 0; font: inherit; font-size: 16px; color: var(--ink);
+        background: var(--glass); border: 1px solid var(--line); border-radius: 24px; padding: 13px 16px;
       }
-      select option { background: #160a05; }
-      textarea { resize: vertical; }
-      button { cursor: pointer; letter-spacing: .04em; }
-      .btn { background: linear-gradient(180deg, #3a1c0c, #240f06); border-color: #5a2c12; color: var(--molten); }
-      .btn:active { background: #4a2410; }
-      .btn.fire { background: linear-gradient(180deg, var(--ember), #c33c0e); border-color: #ff7a3a; color: #1a0a03; font-weight: 700;
-        text-transform: uppercase; letter-spacing: .1em; box-shadow: 0 0 18px rgba(255,90,31,.4); }
+      .composer input::placeholder { color: var(--dim); }
+      .send { background: linear-gradient(180deg, #e9f1ff, #a9c6ff); color: #0b0d12; }
+
+      /* sheet */
+      .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 9; display: none; }
+      .scrim.open { display: block; }
+      .sheet {
+        position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; transform: translateY(100%); transition: transform .25s ease;
+        background: var(--bg2); border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+        max-height: 82dvh; overflow-y: auto;
+      }
+      .sheet.open { transform: translateY(0); }
+      .sheet h3 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin: 2px 0 12px; font-weight: 600; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+      .pick {
+        border: 1px solid var(--line); border-radius: 12px; padding: 12px 8px; text-align: center; background: var(--glass);
+        display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px;
+      }
+      .pick.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
+      .pick .dot { width: 16px; height: 16px; border-radius: 50%; }
+      .pick .lng { font-size: 15px; }
+      label { display: block; font-size: 12px; color: var(--dim); margin: 14px 0 6px; }
+      select, .sheet input[type=text], textarea {
+        width: 100%; font: inherit; font-size: 15px; color: var(--ink);
+        background: var(--glass); border: 1px solid var(--line); border-radius: 10px; padding: 11px;
+      }
+      select option { background: #11141c; }
+      input[type=range] { width: 100%; accent-color: var(--accent); }
+      .btn { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--glass); margin-top: 12px; }
+      .btn.primary { background: linear-gradient(180deg, #e9f1ff, #a9c6ff); color: #0b0d12; border: none; font-weight: 600; }
       .row { display: flex; gap: 10px; } .row > * { flex: 1; }
-      .heatbar { display: flex; align-items: center; gap: 10px; }
-      input[type=range] { -webkit-appearance: none; appearance: none; height: 4px; border-radius: 3px; padding: 0;
-        background: linear-gradient(90deg, #5a2c12, var(--ember), var(--gold)); }
-      input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%;
-        background: var(--white-hot); box-shadow: 0 0 10px var(--ember); border: 2px solid var(--ember); }
-      .gauge { font-size: 11px; color: var(--gold); letter-spacing: .1em; min-width: 92px; text-align: right; }
-      .hint { font-size: 11px; color: var(--dim); margin-top: 10px; line-height: 1.5; }
-
-      /* ---------- RASTRELLIERA / ATTREZZI ---------- */
-      .rack { display: flex; gap: 10px; overflow-x: auto; padding: 4px 2px 8px; scrollbar-width: none; }
-      .rack::-webkit-scrollbar { display: none; }
-      .tool { flex: 0 0 auto; width: 116px; border: 1px solid var(--line); border-radius: 3px; padding: 12px 10px;
-        background: linear-gradient(180deg, rgba(42,22,12,.6), rgba(18,7,4,.6)); cursor: pointer; text-align: center; position: relative; }
-      .tool.on { border-color: var(--ember); box-shadow: 0 0 16px rgba(255,90,31,.3); }
-      .tool .sigil { font-size: 24px; filter: drop-shadow(0 0 6px rgba(255,90,31,.5)); }
-      .tool .nm { font-size: 12px; letter-spacing: .04em; margin-top: 6px; color: var(--text); line-height: 1.25; }
-      .tool .star { position: absolute; top: 4px; right: 6px; font-size: 10px; color: var(--gold); }
-
-      /* ---------- INCUDINE / OUTPUT ---------- */
-      #anvil { min-height: 200px; max-height: 46vh; overflow-y: auto; padding: 4px 2px; }
-      .turn { margin: 10px 0; }
-      .turn .tag { font-size: 10px; letter-spacing: .24em; text-transform: uppercase; color: var(--dim); display: block; margin-bottom: 3px; }
-      .turn.raw .body { color: var(--dim); border-left: 2px solid var(--line); padding-left: 10px; font-style: italic; }
-      .turn.cast .body { font-size: 16px; line-height: 1.55; }
-      .turn.note .body { font-size: 12px; color: var(--dim); }
-      .molten { animation: cool 1.5s ease-out forwards; }
-      @keyframes cool {
-        0% { color: var(--white-hot); text-shadow: 0 0 10px #fff, 0 0 20px var(--ember); }
-        60% { color: var(--molten); text-shadow: 0 0 8px rgba(255,90,31,.6); }
-        100% { color: var(--text); text-shadow: 0 0 1px rgba(255,90,31,.25); }
-      }
-      .composer { display: flex; gap: 10px; align-items: flex-end; margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
-      .composer textarea { flex: 1; }
-      .composer button { width: auto; padding: 12px 18px; }
-      .strip { display: flex; gap: 10px; margin-top: 10px; }
-      .strip button { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 8px 10px; color: var(--dim);
-        background: transparent; border: 1px solid var(--line); }
-      .status { display: flex; gap: 8px; justify-content: center; font-size: 11px; color: var(--dim); margin-top: 6px; letter-spacing: .12em; }
-      .status b { color: var(--gold); font-weight: 600; }
-      #progress { font-size: 12px; color: var(--gold); margin-top: 10px; min-height: 16px; }
-      footer { text-align: center; font-size: 10px; letter-spacing: .22em; color: #6b3a1f; margin-top: 18px; text-transform: uppercase; }
+      .muted { font-size: 12px; color: var(--dim); margin-top: 10px; line-height: 1.5; }
+      #prog { font-size: 12px; color: var(--accent); min-height: 16px; margin-top: 8px; }
     </style>
   </head>
   <body>
-    <canvas id="embers"></canvas>
-    <div class="wrap">
-      <header class="brand">
-        <div class="mark">Vulcano</div>
-        <h1>LA FUCINA</h1>
-        <div class="sub">forgia agenti · fonde modelli · sul tuo dispositivo</div>
-      </header>
+    <!-- TOP -->
+    <div class="top">
+      <button class="iconbtn" id="btnLang" title="language" aria-label="language">🌐</button>
+      <button class="iconbtn" id="btnAgent" title="agent" aria-label="agent">◐</button>
+      <span class="sp"></span>
+      <span class="brand">vulcano</span>
+      <span class="sp"></span>
+      <button class="iconbtn" id="btnPower" title="model" aria-label="model">⚡</button>
+      <button class="iconbtn" id="btnNew" title="new" aria-label="new">＋</button>
+    </div>
 
-      <!-- IL CROGIOLO -->
-      <div class="panel">
-        <p class="kicker">Il Crogiolo · modello locale</p>
-        <div class="forge">
-          <div class="crucible" id="crucible"></div>
-          <div class="ctl">
-            <label>Lega da fondere (modello)</label>
-            <select id="model"><option>— tocca SCALDA per fondere la lista —</option></select>
-            <div class="row" style="margin-top:10px">
-              <button id="showAllBtn" class="btn">+ leghe pesanti</button>
-              <button id="load" class="btn fire">🔥 Scalda la forgia</button>
-            </div>
-          </div>
-        </div>
-        <label>Calore (creatività) <span id="heatVal" class="gauge"></span></label>
-        <div class="heatbar">
-          <input type="range" id="heat" min="0" max="150" value="70" />
-        </div>
-        <div id="progress">Forgia fredda — modalità DIMOSTRAZIONE attiva</div>
-        <div class="hint">Richiede WebGPU. Leghe consigliate su mobile: 0.5B–2B. Si fonde una volta e resta nella forgia (offline).
-          A forgia fredda la fucina lavora in <b>simulazione</b>.</div>
+    <!-- ORB -->
+    <div class="stage">
+      <canvas id="orb" aria-hidden="true"></canvas>
+      <div class="tagline" id="tagline"></div>
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="out" id="out"></div>
+
+    <!-- COMPOSER -->
+    <div class="composer">
+      <button class="iconbtn" id="btnMic" title="speak" aria-label="speak">🎙️</button>
+      <input id="prompt" autocomplete="off" />
+      <button class="iconbtn send" id="btnSend" aria-label="send">➤</button>
+    </div>
+
+    <!-- SHEETS -->
+    <div class="scrim" id="scrim"></div>
+
+    <div class="sheet" id="sheetLang">
+      <h3 id="t_language"></h3>
+      <div class="grid" id="langGrid"></div>
+    </div>
+
+    <div class="sheet" id="sheetAgent">
+      <h3 id="t_agent"></h3>
+      <div class="grid" id="agentGrid"></div>
+      <label id="t_directives"></label>
+      <textarea id="sys" rows="3"></textarea>
+      <div class="row">
+        <input type="text" id="agentName" />
+        <button class="btn" id="forgeBtn" style="margin-top:0"></button>
       </div>
+      <button class="btn" id="delAgent"></button>
+    </div>
 
-      <!-- LA RASTRELLIERA -->
-      <div class="panel">
-        <p class="kicker">La Rastrelliera · agenti forgiati</p>
-        <div class="rack" id="rack"></div>
-        <label>Tempra (istruzioni dell'attrezzo)</label>
-        <textarea id="sys" rows="3"></textarea>
-        <div class="row" style="margin-top:10px">
-          <input type="text" id="agentName" placeholder="Nome nuovo attrezzo" />
-          <button id="forgeBtn" class="btn">⚒️ Forgia</button>
-        </div>
-        <div class="strip"><button id="delAgent">Fondi attrezzo selezionato</button></div>
-        <div class="hint">Gli attrezzi forgiati restano nella memoria del dispositivo. Nessun server, nessuna chiave.</div>
-      </div>
-
-      <!-- L'INCUDINE -->
-      <div class="panel">
-        <p class="kicker">L'Incudine · lavorazione</p>
-        <div id="anvil"></div>
-        <div class="composer">
-          <textarea id="prompt" rows="2" placeholder="Getta il materiale grezzo nella forgia…"></textarea>
-          <button id="send" class="btn fire">Batti</button>
-        </div>
-        <div class="strip"><button id="reset">Spegni e ricomincia</button></div>
-        <div class="status">
-          <span>FORGIA: <b id="modeChip">DIMOSTRAZIONE</b></span>
-          <span>·</span>
-          <span>RETE: <b id="netChip">—</b></span>
-        </div>
-      </div>
-
-      <footer>Vulcano Foundry · on-device · no API</footer>
+    <div class="sheet" id="sheetModel">
+      <h3 id="t_model"></h3>
+      <select id="model"></select>
+      <button class="btn" id="showAllBtn"></button>
+      <button class="btn primary" id="load"></button>
+      <div id="prog"></div>
+      <label id="t_heat"></label>
+      <input type="range" id="heat" min="0" max="150" value="70" />
+      <div class="muted" id="t_modelnote"></div>
     </div>
 
     <script type="module">
@@ -179,67 +151,151 @@
       const STORE = "vulcano.agents";
       const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-      // ---------- BRACI (canvas) ----------
-      const cv = $("embers"), cx = cv.getContext("2d");
-      let W, H, parts = [], emit = 0.5;
-      function resize() { W = cv.width = innerWidth; H = cv.height = innerHeight; }
-      addEventListener("resize", resize); resize();
-      function spawn(n) { for (let i = 0; i < n; i++) parts.push({
-        x: Math.random() * W, y: H + 8, vx: (Math.random() - .5) * .4, vy: -(.4 + Math.random() * 1.3),
-        r: .6 + Math.random() * 2, life: 1, hue: 18 + Math.random() * 26 }); }
-      function tick() {
-        cx.clearRect(0, 0, W, H);
-        if (Math.random() < emit) spawn(1);
-        for (const p of parts) { p.x += p.vx; p.y += p.vy; p.vy -= .002; p.life -= .006;
-          cx.globalAlpha = Math.max(0, p.life); cx.fillStyle = `hsl(${p.hue},100%,${55 + p.life * 15}%)`;
-          cx.shadowBlur = 8; cx.shadowColor = `hsl(${p.hue},100%,55%)`;
-          cx.beginPath(); cx.arc(p.x, p.y, p.r, 0, 7); cx.fill(); }
-        cx.globalAlpha = 1; cx.shadowBlur = 0;
-        parts = parts.filter((p) => p.life > 0 && p.y > -10);
-        if (parts.length > 240) parts.splice(0, parts.length - 240);
-        requestAnimationFrame(tick);
-      }
-      document.addEventListener("visibilitychange", () => {}); tick();
+      // ---------------- I18N (zero geographic/cultural bias: each language in its own script) ----------------
+      const LANGS = {
+        en: { name: "English", bcp: "en-US",
+          tagline: "AI for everyone — on your device, free.", ph: "Speak or write in any language…",
+          language: "Language", agent: "Agent", directives: "Instructions", create: "Create", newName: "New agent name",
+          remove: "Remove selected agent", model: "Engine", showAll: "Show all engines", power: "Power the engine",
+          imagination: "Imagination", cold: "Engine off — demo mode", ready: "Ready",
+          thinking: "thinking…", listening: "listening…",
+          demo: (n) => `[demo] Agent “${n}” is ready, but no model is loaded. Tap ⚡ to power a real on-device model. Nothing leaves your device.`,
+          note: "Needs WebGPU. Lightest models run on any phone. Downloads once, then works offline." },
+        es: { name: "Español", bcp: "es-ES",
+          tagline: "IA para todos — en tu dispositivo, gratis.", ph: "Habla o escribe en cualquier idioma…",
+          language: "Idioma", agent: "Agente", directives: "Instrucciones", create: "Crear", newName: "Nombre del nuevo agente",
+          remove: "Eliminar agente seleccionado", model: "Motor", showAll: "Mostrar todos los motores", power: "Encender el motor",
+          imagination: "Imaginación", cold: "Motor apagado — modo demo", ready: "Listo",
+          thinking: "pensando…", listening: "escuchando…",
+          demo: (n) => `[demo] El agente «${n}» está listo, pero no hay modelo cargado. Toca ⚡ para encender un modelo real en el dispositivo. Nada sale de tu dispositivo.`,
+          note: "Requiere WebGPU. Los modelos más ligeros funcionan en cualquier móvil. Se descarga una vez y luego funciona sin conexión." },
+        ar: { name: "العربية", bcp: "ar-SA", rtl: true,
+          tagline: "ذكاء اصطناعي للجميع — على جهازك، مجانًا.", ph: "تحدث أو اكتب بأي لغة…",
+          language: "اللغة", agent: "الوكيل", directives: "التعليمات", create: "إنشاء", newName: "اسم وكيل جديد",
+          remove: "حذف الوكيل المحدد", model: "المحرك", showAll: "عرض كل المحركات", power: "تشغيل المحرك",
+          imagination: "الخيال", cold: "المحرك متوقف — وضع العرض", ready: "جاهز",
+          thinking: "يفكر…", listening: "يستمع…",
+          demo: (n) => `[عرض] الوكيل «${n}» جاهز، لكن لا يوجد نموذج محمّل. اضغط ⚡ لتشغيل نموذج حقيقي على الجهاز. لا شيء يغادر جهازك.`,
+          note: "يتطلب WebGPU. أخف النماذج تعمل على أي هاتف. يُحمَّل مرة واحدة ثم يعمل دون اتصال." },
+        zh: { name: "中文", bcp: "zh-CN",
+          tagline: "人人可用的 AI —— 在你的设备上，免费。", ph: "用任何语言说或写……",
+          language: "语言", agent: "智能体", directives: "指令", create: "创建", newName: "新智能体名称",
+          remove: "删除所选智能体", model: "引擎", showAll: "显示全部引擎", power: "启动引擎",
+          imagination: "想象力", cold: "引擎关闭 —— 演示模式", ready: "就绪",
+          thinking: "思考中……", listening: "聆听中……",
+          demo: (n) => `[演示] 智能体「${n}」已就绪，但未加载模型。点击 ⚡ 在本机启动真实模型。数据不会离开你的设备。`,
+          note: "需要 WebGPU。最轻量的模型可在任何手机上运行。仅下载一次，之后离线可用。" },
+        hi: { name: "हिन्दी", bcp: "hi-IN",
+          tagline: "सबके लिए AI — आपके डिवाइस पर, मुफ़्त।", ph: "किसी भी भाषा में बोलें या लिखें…",
+          language: "भाषा", agent: "एजेंट", directives: "निर्देश", create: "बनाएँ", newName: "नए एजेंट का नाम",
+          remove: "चयनित एजेंट हटाएँ", model: "इंजन", showAll: "सभी इंजन दिखाएँ", power: "इंजन चालू करें",
+          imagination: "कल्पना", cold: "इंजन बंद — डेमो मोड", ready: "तैयार",
+          thinking: "सोच रहा है…", listening: "सुन रहा है…",
+          demo: (n) => `[डेमो] एजेंट “${n}” तैयार है, पर कोई मॉडल लोड नहीं है। डिवाइस पर असली मॉडल चलाने के लिए ⚡ दबाएँ। कुछ भी आपके डिवाइस से बाहर नहीं जाता।`,
+          note: "WebGPU चाहिए। सबसे हल्के मॉडल किसी भी फ़ोन पर चलते हैं। एक बार डाउनलोड, फिर ऑफ़लाइन।" },
+        sw: { name: "Kiswahili", bcp: "sw-KE",
+          tagline: "AI kwa kila mtu — kwenye kifaa chako, bure.", ph: "Sema au andika kwa lugha yoyote…",
+          language: "Lugha", agent: "Wakala", directives: "Maelekezo", create: "Tengeneza", newName: "Jina la wakala mpya",
+          remove: "Ondoa wakala uliochaguliwa", model: "Injini", showAll: "Onyesha injini zote", power: "Washa injini",
+          imagination: "Ubunifu", cold: "Injini imezimwa — hali ya onyesho", ready: "Tayari",
+          thinking: "inafikiri…", listening: "inasikiliza…",
+          demo: (n) => `[onyesho] Wakala “${n}” yuko tayari, lakini hakuna modeli iliyopakiwa. Gusa ⚡ kuwasha modeli halisi kwenye kifaa. Hakuna kinachotoka kwenye kifaa chako.`,
+          note: "Inahitaji WebGPU. Modeli nyepesi zinafanya kazi kwenye simu yoyote. Hupakuliwa mara moja, kisha hufanya kazi nje ya mtandao." },
+        ru: { name: "Русский", bcp: "ru-RU",
+          tagline: "ИИ для всех — на вашем устройстве, бесплатно.", ph: "Говорите или пишите на любом языке…",
+          language: "Язык", agent: "Агент", directives: "Инструкции", create: "Создать", newName: "Имя нового агента",
+          remove: "Удалить выбранного агента", model: "Движок", showAll: "Показать все движки", power: "Запустить движок",
+          imagination: "Воображение", cold: "Движок выключен — демо-режим", ready: "Готово",
+          thinking: "думает…", listening: "слушает…",
+          demo: (n) => `[демо] Агент «${n}» готов, но модель не загружена. Нажмите ⚡, чтобы запустить настоящую модель на устройстве. Ничего не покидает ваше устройство.`,
+          note: "Требуется WebGPU. Самые лёгкие модели работают на любом телефоне. Загружается один раз, затем работает офлайн." },
+        fr: { name: "Français", bcp: "fr-FR",
+          tagline: "L’IA pour tous — sur votre appareil, gratuite.", ph: "Parlez ou écrivez dans n’importe quelle langue…",
+          language: "Langue", agent: "Agent", directives: "Instructions", create: "Créer", newName: "Nom du nouvel agent",
+          remove: "Supprimer l’agent sélectionné", model: "Moteur", showAll: "Afficher tous les moteurs", power: "Démarrer le moteur",
+          imagination: "Imagination", cold: "Moteur éteint — mode démo", ready: "Prêt",
+          thinking: "réflexion…", listening: "écoute…",
+          demo: (n) => `[démo] L’agent « ${n} » est prêt, mais aucun modèle n’est chargé. Touchez ⚡ pour lancer un vrai modèle sur l’appareil. Rien ne quitte votre appareil.`,
+          note: "Nécessite WebGPU. Les modèles les plus légers fonctionnent sur n’importe quel téléphone. Téléchargé une fois, puis hors ligne." },
+      };
+      let lang = localStorage.getItem("vulcano.lang") || (navigator.language || "en").slice(0, 2);
+      if (!LANGS[lang]) lang = "en";
 
-      // ---------- AGENTI (attrezzi) ----------
+      function applyLang() {
+        const L = LANGS[lang];
+        document.documentElement.lang = lang;
+        document.documentElement.dir = L.rtl ? "rtl" : "ltr";
+        $("tagline").textContent = L.tagline;
+        $("prompt").placeholder = L.ph;
+        $("t_language").textContent = L.language;
+        $("t_agent").textContent = L.agent;
+        $("t_directives").textContent = L.directives;
+        $("t_model").textContent = L.model;
+        $("t_heat").textContent = L.imagination;
+        $("t_modelnote").textContent = L.note;
+        $("forgeBtn").textContent = L.create;
+        $("agentName").placeholder = L.newName;
+        $("delAgent").textContent = L.remove;
+        $("showAllBtn").textContent = L.showAll;
+        $("load").textContent = L.power;
+        if (!modelLoaded) $("prog").textContent = L.cold;
+        localStorage.setItem("vulcano.lang", lang);
+      }
+      function renderLangs() {
+        const g = $("langGrid"); g.innerHTML = "";
+        for (const code of Object.keys(LANGS)) {
+          const b = document.createElement("button");
+          b.className = "pick" + (code === lang ? " on" : "");
+          b.innerHTML = `<span class="lng">${LANGS[code].name}</span>`;
+          b.onclick = () => { lang = code; applyLang(); renderLangs(); resetChat(); closeSheets(); };
+          g.appendChild(b);
+        }
+      }
+
+      // ---------------- AGENTS (universal pictograms, names shown in chosen language where natural) ----------------
       const BUILTIN = [
-        { id: "generale", sigil: "🛠️", name: "Factotum", system: "Sei un assistente utile, conciso e in italiano. Rispondi in modo chiaro e diretto." },
-        { id: "coder", sigil: "⚙️", name: "Fabbro di codice", system: "Sei un assistente di programmazione esperto. Fornisci codice corretto e spiegazioni brevi. Usa blocchi di codice." },
-        { id: "traduttore", sigil: "🗝️", name: "Interprete", system: "Sei un traduttore. Traduci il testo dell'utente tra italiano e inglese, restituendo solo la traduzione." },
-        { id: "riassunto", sigil: "🔪", name: "Cesello", system: "Riassumi il testo dell'utente in pochi punti chiave, in italiano, mantenendo le informazioni essenziali." },
-        { id: "brainstorm", sigil: "✨", name: "Scintilla", system: "Sei un partner creativo. Genera idee originali e concrete, in elenco puntato, in italiano." },
-        { id: "tutor", sigil: "📜", name: "Mastro", system: "Sei un tutor paziente. Spiega i concetti in modo semplice con esempi quotidiani, in italiano." },
+        { id: "generale", color: "#cfe3ff", glyph: "◐", names: { en: "Companion", es: "Compañero", ar: "رفيق", zh: "助手", hi: "साथी", sw: "Mwenza", ru: "Спутник", fr: "Compagnon" },
+          system: "You are a helpful, concise assistant." },
+        { id: "coder", color: "#a7f3d0", glyph: "⌨", names: { en: "Builder", es: "Constructor", ar: "مُنشئ", zh: "构建者", hi: "निर्माता", sw: "Mjenzi", ru: "Строитель", fr: "Bâtisseur" },
+          system: "You are an expert programming assistant. Give correct code and short explanations." },
+        { id: "traduttore", color: "#fde68a", glyph: "⇄", names: { en: "Bridge", es: "Puente", ar: "جسر", zh: "桥", hi: "सेतु", sw: "Daraja", ru: "Мост", fr: "Pont" },
+          system: "You are a translator. Translate the user's text to the language they ask for, output only the translation." },
+        { id: "tutor", color: "#c4b5fd", glyph: "✶", names: { en: "Teacher", es: "Maestro", ar: "معلّم", zh: "老师", hi: "शिक्षक", sw: "Mwalimu", ru: "Учитель", fr: "Maître" },
+          system: "You are a patient teacher. Explain ideas simply with everyday examples." },
+        { id: "brainstorm", color: "#fca5a5", glyph: "✷", names: { en: "Spark", es: "Chispa", ar: "شرارة", zh: "灵感", hi: "चिंगारी", sw: "Cheche", ru: "Искра", fr: "Étincelle" },
+          system: "You are a creative partner. Generate original, concrete ideas as a short list." },
       ];
       const loadCustom = () => { try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch { return []; } };
       const saveCustom = (a) => localStorage.setItem(STORE, JSON.stringify(a));
       let selected = "b:generale";
+      const agentName = (a) => (a.names ? (a.names[lang] || a.names.en) : a.name);
 
-      function renderRack(sel) {
-        if (sel) selected = sel;
-        const rack = $("rack"); rack.innerHTML = "";
-        const make = (a, g) => {
-          const v = (g === "c" ? "c:" : "b:") + a.id;
-          const el = document.createElement("div");
-          el.className = "tool" + (v === selected ? " on" : "");
-          el.innerHTML = `${g === "c" ? '<span class="star">★</span>' : ""}<div class="sigil">${a.sigil || "⚒️"}</div><div class="nm">${a.name}</div>`;
-          el.onclick = () => { selected = v; applyAgent(); renderRack(); };
-          rack.appendChild(el);
-        };
-        BUILTIN.forEach((a) => make(a, "b"));
-        loadCustom().forEach((a) => make(a, "c"));
-        applyAgent();
-      }
       function currentAgent() {
         const [g, id] = selected.split(":");
         const list = g === "c" ? loadCustom() : BUILTIN;
         return list.find((a) => a.id === id) || BUILTIN[0];
       }
-      function applyAgent() { $("sys").value = currentAgent().system; }
+      function renderAgents(sel) {
+        if (sel) selected = sel;
+        const grid = $("agentGrid"); grid.innerHTML = "";
+        const make = (a, g) => {
+          const v = (g === "c" ? "c:" : "b:") + a.id;
+          const b = document.createElement("button");
+          b.className = "pick" + (v === selected ? " on" : "");
+          b.innerHTML = `<span class="dot" style="background:${a.color || "#cfe3ff"}"></span><span>${a.glyph || "◆"} ${agentName(a)}</span>`;
+          b.onclick = () => { selected = v; $("sys").value = currentAgent().system; renderAgents(); };
+          grid.appendChild(b);
+        };
+        BUILTIN.forEach((a) => make(a, "b"));
+        loadCustom().forEach((a) => make(a, "c"));
+        $("sys").value = currentAgent().system;
+        $("btnAgent").textContent = currentAgent().glyph || "◐";
+      }
 
-      // ---------- MODELLI (lazy WebLLM) ----------
-      let webllm = null, modelsLoaded = false, showAll = false;
+      // ---------------- MODELS (lazy WebLLM) ----------------
+      let webllm = null, modelsListed = false, modelLoaded = false, showAll = false;
       async function importWebLLM() { if (!webllm) webllm = await import("https://esm.run/@mlc-ai/web-llm"); return webllm; }
-      async function loadModelList() {
+      async function listModels() {
         const sel = $("model");
         try {
           const w = await importWebLLM();
@@ -254,109 +310,149 @@
           }
           const def = list.find((m) => /Qwen2\.5-1\.5B|Llama-3\.2-1B/.test(m.model_id)) || list[0];
           if (def) sel.value = def.model_id;
-          modelsLoaded = true;
-        } catch { sel.innerHTML = '<option>lista non disponibile offline — connettiti una volta</option>'; }
+          modelsListed = true;
+        } catch { sel.innerHTML = "<option>—</option>"; }
       }
 
-      // ---------- FORNACE / ENGINE ----------
+      // ---------------- ORB (universal: a living light = your device thinking) ----------------
+      const orb = $("orb"), octx = orb.getContext("2d");
+      let dpr = Math.min(devicePixelRatio || 1, 2), t = 0, intensity = 0.0, targetI = 0.0, dust = [];
+      function sizeOrb() {
+        const s = Math.min(innerWidth * 0.7, 300);
+        orb.style.width = orb.style.height = s + "px";
+        orb.width = s * dpr; orb.height = s * dpr;
+      }
+      addEventListener("resize", sizeOrb); sizeOrb();
+      for (let i = 0; i < 36; i++) dust.push({ a: Math.random() * 6.28, r: 0.5 + Math.random() * 0.5, sp: 0.2 + Math.random() * 0.6, ph: Math.random() * 6.28 });
+      function drawOrb() {
+        const w = orb.width, h = orb.height, cxp = w / 2, cyp = h / 2, R = Math.min(w, h) / 2;
+        octx.clearRect(0, 0, w, h);
+        intensity += (targetI - intensity) * 0.06;
+        const breath = 0.5 + 0.5 * Math.sin(t * 0.9);
+        const core = R * (0.34 + 0.05 * breath + 0.06 * intensity);
+        // spectral aura (inclusive, no single color) — slow hue rotation, desaturated
+        const hue = (t * 12) % 360;
+        const aura = octx.createRadialGradient(cxp, cyp, core * 0.4, cxp, cyp, R);
+        aura.addColorStop(0, `hsla(${hue},70%,85%,${0.5 + 0.4 * intensity})`);
+        aura.addColorStop(0.45, `hsla(${(hue + 60) % 360},65%,70%,${0.16 + 0.2 * intensity})`);
+        aura.addColorStop(1, "hsla(220,40%,10%,0)");
+        octx.fillStyle = aura; octx.beginPath(); octx.arc(cxp, cyp, R, 0, 6.2832); octx.fill();
+        // core light
+        const cg = octx.createRadialGradient(cxp, cyp, 0, cxp, cyp, core);
+        cg.addColorStop(0, "rgba(255,255,255,0.98)");
+        cg.addColorStop(0.6, `hsla(${(hue + 30) % 360},60%,88%,0.9)`);
+        cg.addColorStop(1, "rgba(255,255,255,0)");
+        octx.fillStyle = cg; octx.beginPath(); octx.arc(cxp, cyp, core, 0, 6.2832); octx.fill();
+        // orbiting dust (motes of light)
+        for (const d of dust) {
+          const ang = d.a + t * d.sp * (0.4 + intensity);
+          const rad = R * (0.55 + 0.4 * Math.sin(t * 0.5 + d.ph)) * d.r;
+          const x = cxp + Math.cos(ang) * rad, y = cyp + Math.sin(ang) * rad;
+          octx.globalAlpha = 0.35 + 0.5 * intensity;
+          octx.fillStyle = `hsla(${(hue + 90) % 360},80%,85%,1)`;
+          octx.beginPath(); octx.arc(x, y, 1.6 * dpr, 0, 6.2832); octx.fill();
+        }
+        octx.globalAlpha = 1;
+        t += 0.016 + 0.02 * intensity;
+        requestAnimationFrame(drawOrb);
+      }
+      drawOrb();
+
+      // ---------------- ENGINE ----------------
       let engine = null, loadedModel = null, mode = "demo", busy = false;
       const history = [];
-      const setHeat = (h) => { $("crucible").style.setProperty("--heat", h.toFixed(3)); };
-      function setMode(m) { mode = m; $("modeChip").textContent = m === "local" ? "LEGA FUSA" : "DIMOSTRAZIONE"; }
-
-      const onProgress = (r) => {
-        $("progress").textContent = `Fusione: ${r.text} ${(r.progress || 0) * 100 | 0}%`;
-        setHeat(0.1 + (r.progress || 0) * 0.85); emit = 0.5 + (r.progress || 0) * 2.5;
-      };
+      const onProgress = (r) => { $("prog").textContent = `${(r.progress || 0) * 100 | 0}% · ${r.text}`; targetI = 0.2 + (r.progress || 0) * 0.6; };
       async function ensureModel() {
-        if (!modelsLoaded) await loadModelList();
-        const id = $("model").value;
-        if (!id || /non disponibile|tocca SCALDA/.test(id)) throw new Error("scegli una lega (modello) valida");
+        if (!modelsListed) await listModels();
+        const id = $("model").value; if (!id || id === "—") throw new Error("no engine");
         if (engine && loadedModel === id) return engine;
         const w = await importWebLLM();
         if (!engine) engine = await w.CreateMLCEngine(id, { initProgressCallback: onProgress });
         else await engine.reload(id);
-        loadedModel = id; setMode("local"); setHeat(0.95); emit = 1.2;
-        $("progress").textContent = `Forgia incandescente — ${id}`;
+        loadedModel = id; modelLoaded = true; mode = "local"; targetI = 0.15;
+        $("prog").textContent = LANGS[lang].ready + " · " + id;
         return engine;
       }
       async function* demoStream(text, agent) {
-        const reply =
-          `[SIMULAZIONE — forgia fredda]  L'attrezzo «${agent.name}» è sull'incudine ma la lega non è fusa. ` +
-          `Materiale ricevuto: "${text}". Per battere metallo vero: Il Crogiolo → 🔥 Scalda la forgia. ` +
-          `Tutto resta sul dispositivo, niente lascia la fucina.`;
+        const msg = LANGS[lang].demo(agentName(agent));
         let buf = "";
-        for (const ch of reply) { buf += ch; if (buf.length >= 3) { yield buf; buf = ""; await sleep(22); } }
+        for (const ch of msg) { buf += ch; if (buf.length >= 3) { yield buf; buf = ""; await sleep(20); } }
         if (buf) yield buf;
       }
 
-      // ---------- INCUDINE ----------
-      function addTurn(tag, cls) {
-        const t = document.createElement("div"); t.className = "turn " + cls;
-        const lab = document.createElement("span"); lab.className = "tag"; lab.textContent = tag;
-        const body = document.createElement("div"); body.className = "body";
-        t.append(lab, body); $("anvil").append(t); t.scrollIntoView({ block: "end" });
-        return body;
-      }
-      function pour(body, chunk) {
-        const s = document.createElement("span"); s.className = "molten"; s.textContent = chunk;
-        body.append(s); body.scrollIntoView({ block: "end" });
-      }
-      function resetChat() {
-        history.length = 0; $("anvil").innerHTML = "";
-        addTurn("Forgia", "note").textContent =
-          `Incudine pulita. Attrezzo: ${currentAgent().name}. Forgia: ${mode === "local" ? "lega fusa" : "dimostrazione"}.`;
-      }
+      // ---------------- OUTPUT ----------------
+      function isRTLText(s) { return /[֐-׿؀-ۿ܀-߿]/.test((s || "").trim()[0] || ""); }
+      function addTurn(cls) { const d = document.createElement("div"); d.className = "turn " + cls; $("out").append(d); d.scrollIntoView({ block: "end" }); return d; }
+      function resetChat() { history.length = 0; $("out").innerHTML = ""; const n = addTurn("note"); n.textContent = LANGS[lang].tagline; }
       async function send() {
         if (busy) return;
         const text = $("prompt").value.trim(); if (!text) return;
-        busy = true; $("send").disabled = true; $("prompt").value = "";
-        emit = Math.max(emit, 2.2);
+        busy = true; $("prompt").value = "";
         const agent = currentAgent();
-        addTurn("Materiale", "raw").textContent = text;
+        const yt = addTurn("you"); yt.textContent = text; yt.dir = isRTLText(text) ? "rtl" : "ltr";
         history.push({ role: "user", content: text });
-        const body = addTurn(agent.name, "cast");
+        const at = addTurn("ai"); at.textContent = LANGS[lang].thinking;
+        targetI = 1.0;
         try {
           let acc = "";
           if (mode === "local") {
             const eng = await ensureModel();
-            const messages = [{ role: "system", content: $("sys").value.trim() || "Sei un assistente utile." }, ...history];
-            const temp = +$("heat").value / 100;
-            const stream = await eng.chat.completions.create({ messages, stream: true, temperature: temp });
-            for await (const chunk of stream) { const d = chunk.choices?.[0]?.delta?.content || ""; if (d) { acc += d; pour(body, d); } }
+            const sys = ($("sys").value.trim() || "You are helpful.") + ` Always reply in the user's language (${LANGS[lang].name}).`;
+            const stream = await eng.chat.completions.create({ messages: [{ role: "system", content: sys }, ...history], stream: true, temperature: +$("heat").value / 100 });
+            at.textContent = "";
+            for await (const c of stream) { const d = c.choices?.[0]?.delta?.content || ""; if (d) { acc += d; at.textContent = acc; at.scrollIntoView({ block: "end" }); } }
           } else {
-            for await (const c of demoStream(text, agent)) { acc += c; pour(body, c); }
+            at.textContent = "";
+            for await (const c of demoStream(text, agent)) { acc += c; at.textContent = acc; at.scrollIntoView({ block: "end" }); }
           }
+          at.dir = isRTLText(acc) ? "rtl" : "ltr";
           history.push({ role: "assistant", content: acc });
-        } catch (e) { body.textContent = "⚠ Lega incrinata: " + (e?.message || e); }
-        finally { busy = false; $("send").disabled = false; emit = mode === "local" ? 1.2 : 0.5; $("prompt").focus(); }
+        } catch (e) { at.textContent = "⚠ " + (e?.message || e); }
+        finally { busy = false; targetI = mode === "local" ? 0.15 : 0.0; }
       }
 
-      // ---------- EVENTI ----------
-      $("heat").oninput = () => { $("heatVal").textContent = (+$("heat").value / 100).toFixed(2); };
-      $("showAllBtn").onclick = async () => { showAll = !showAll; $("showAllBtn").textContent = showAll ? "− solo leggere" : "+ leghe pesanti"; modelsLoaded = false; await loadModelList(); };
-      $("load").onclick = () => ensureModel().catch((e) => { $("progress").textContent = "⚠ " + (e?.message || e); });
+      // ---------------- VOICE (pre-literate access) ----------------
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SR) $("btnMic").style.display = "none";
+      $("btnMic").onclick = () => {
+        if (!SR) return;
+        const rec = new SR(); rec.lang = LANGS[lang].bcp; rec.interimResults = false;
+        $("prompt").placeholder = LANGS[lang].listening; targetI = 0.6;
+        rec.onresult = (e) => { $("prompt").value = e.results[0][0].transcript; send(); };
+        rec.onend = () => { $("prompt").placeholder = LANGS[lang].ph; if (!busy) targetI = mode === "local" ? 0.15 : 0.0; };
+        rec.onerror = rec.onend; rec.start();
+      };
+
+      // ---------------- SHEETS ----------------
+      const sheets = ["sheetLang", "sheetAgent", "sheetModel"];
+      function closeSheets() { sheets.forEach((s) => $(s).classList.remove("open")); $("scrim").classList.remove("open"); }
+      function openSheet(id) { closeSheets(); $(id).classList.add("open"); $("scrim").classList.add("open"); }
+      $("scrim").onclick = closeSheets;
+      $("btnLang").onclick = () => { renderLangs(); openSheet("sheetLang"); };
+      $("btnAgent").onclick = () => { renderAgents(); openSheet("sheetAgent"); };
+      $("btnPower").onclick = async () => { openSheet("sheetModel"); if (!modelsListed) await listModels(); };
+
+      // ---------------- EVENTS ----------------
+      $("btnSend").onclick = send;
+      $("btnNew").onclick = resetChat;
+      $("prompt").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); send(); } });
+      $("prompt").addEventListener("input", () => { $("prompt").dir = isRTLText($("prompt").value) ? "rtl" : "ltr"; });
+      $("load").onclick = () => ensureModel().catch((e) => { $("prog").textContent = "⚠ " + (e?.message || e); });
+      $("showAllBtn").onclick = async () => { showAll = !showAll; modelsListed = false; await listModels(); };
       $("forgeBtn").onclick = () => {
         const name = $("agentName").value.trim(), system = $("sys").value.trim();
-        if (!name || !system) { alert("Servono nome e tempra (istruzioni)."); return; }
-        const custom = loadCustom(); const id = "u" + Date.now();
-        custom.push({ id, sigil: "⚒️", name, system }); saveCustom(custom);
-        $("agentName").value = ""; renderRack("c:" + id);
+        if (!name || !system) return;
+        const custom = loadCustom(), id = "u" + Date.now();
+        custom.push({ id, color: "#9ae6b4", glyph: "✦", name, system }); saveCustom(custom);
+        $("agentName").value = ""; renderAgents("c:" + id);
       };
       $("delAgent").onclick = () => {
-        if (!selected.startsWith("c:")) { alert("Seleziona un attrezzo forgiato da te (★)."); return; }
-        saveCustom(loadCustom().filter((a) => a.id !== selected.slice(2))); renderRack("b:generale");
+        if (!selected.startsWith("c:")) return;
+        saveCustom(loadCustom().filter((a) => a.id !== selected.slice(2))); renderAgents("b:generale");
       };
-      $("send").onclick = send;
-      $("prompt").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
-      $("reset").onclick = resetChat;
 
-      const setNet = () => { $("netChip").textContent = navigator.onLine ? "ONLINE" : "OFFLINE"; };
-      addEventListener("online", setNet); addEventListener("offline", setNet); setNet();
-
-      // ---------- INIT ----------
-      $("heatVal").textContent = "0.70";
-      setHeat(0.08); setMode("demo"); renderRack("b:generale"); resetChat();
+      // ---------------- INIT ----------------
+      applyLang(); renderAgents("b:generale"); resetChat();
       if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
         addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
     </script>
