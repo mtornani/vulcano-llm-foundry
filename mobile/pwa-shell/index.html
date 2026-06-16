@@ -1,458 +1,387 @@
 <!doctype html>
-<html lang="en">
+<html lang="it">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#0b0d12" />
+    <meta name="theme-color" content="#15171c" />
     <link rel="manifest" href="public/manifest.json" />
     <link rel="apple-touch-icon" href="public/icons/icon-192.png" />
-    <title>◌ — AI for everyone, on your device</title>
+    <title>VULCANO • Banco Modulare</title>
     <style>
       :root {
-        --bg: #0b0d12; --bg2: #11141c; --ink: #f3f5fb; --dim: #9aa3b8; --line: #232838;
-        --glass: rgba(255,255,255,.04); --accent: #cfe3ff;
+        --steel: #1b1e24; --steel2: #23272f; --panel: #2c313b; --panel2: #343a45;
+        --silk: #e7ecf3; --dim: #8b93a3; --gold: #d9b35a; --line: #11131884;
+        --led-off: #3a2230; --green: #57e389; --amber: #ffb454; --red: #ff5d5d; --cyan: #5cc8ff;
       }
-      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-      html, body { margin: 0; height: 100%; }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+      html, body { margin: 0; }
       body {
-        font-family: system-ui, "Segoe UI", "Noto Sans", "Noto Sans Arabic", "Noto Sans CJK SC", "Noto Sans Devanagari", Roboto, sans-serif;
-        background: radial-gradient(120% 80% at 50% 0%, #141a2a 0%, var(--bg) 60%, #06070b 100%);
-        color: var(--ink); display: flex; flex-direction: column; height: 100dvh; overflow: hidden;
+        font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; color: var(--silk);
+        background:
+          repeating-linear-gradient(90deg, rgba(255,255,255,.012) 0 2px, transparent 2px 6px),
+          linear-gradient(180deg, #16181d, #0e0f13);
         padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
       }
-      button { font: inherit; color: inherit; cursor: pointer; background: none; border: none; }
-      .iconbtn {
-        width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; font-size: 20px;
-        background: var(--glass); border: 1px solid var(--line); color: var(--ink);
-      }
-      .iconbtn:active { background: rgba(255,255,255,.12); }
+      .wrap { max-width: 560px; margin: 0 auto; padding: 12px 12px 28px; }
+      .head { display: flex; align-items: center; gap: 10px; padding: 6px 4px 14px; }
+      .head .logo { font-weight: 700; letter-spacing: .14em; font-size: 15px; }
+      .head .tag { font-size: 10px; color: var(--dim); letter-spacing: .1em; }
+      .head .sp { flex: 1; }
+      .head .led-pwr { width: 9px; height: 9px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); }
 
-      /* top bar */
-      .top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
-      .top .sp { flex: 1; }
-      .brand { font-size: 13px; letter-spacing: .35em; color: var(--dim); text-transform: uppercase; }
-
-      /* orb stage */
-      .stage { flex: 1; position: relative; display: grid; place-items: center; min-height: 0; }
-      #orb { width: min(70vw, 300px); height: min(70vw, 300px); display: block; }
-      .tagline { position: absolute; bottom: 10px; left: 0; right: 0; text-align: center; font-size: 13px; color: var(--dim); padding: 0 24px; }
-
-      /* response */
-      .out { max-height: 30vh; overflow-y: auto; padding: 4px 18px; }
-      .turn { margin: 8px 0; line-height: 1.55; }
-      .turn.you { color: var(--dim); font-size: 14px; }
-      .turn.you::before { content: "•"; margin-inline-end: 8px; color: var(--accent); }
-      .turn.ai { font-size: 17px; }
-      .turn.note { color: var(--dim); font-size: 13px; text-align: center; }
-
-      /* composer */
-      .composer { display: flex; align-items: center; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-        border-top: 1px solid var(--line); background: var(--bg2); }
-      .composer input {
-        flex: 1; min-width: 0; font: inherit; font-size: 16px; color: var(--ink);
-        background: var(--glass); border: 1px solid var(--line); border-radius: 24px; padding: 13px 16px;
+      /* generic panel look: brushed metal + screws */
+      .module {
+        position: relative; border-radius: 8px; padding: 14px 14px 12px; margin: 0;
+        background: linear-gradient(180deg, var(--panel2), var(--panel));
+        border: 1px solid #0c0e12; box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 3px 8px rgba(0,0,0,.4);
       }
-      .composer input::placeholder { color: var(--dim); }
-      .send { background: linear-gradient(180deg, #e9f1ff, #a9c6ff); color: #0b0d12; }
+      .module.io { background: linear-gradient(180deg, #2a2f39, #1f232b); }
+      .screw { position: absolute; width: 8px; height: 8px; border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #cfd6e0, #555b66); box-shadow: 0 1px 1px #000; }
+      .screw.tl { top: 6px; left: 6px; } .screw.tr { top: 6px; right: 6px; }
+      .screw.bl { bottom: 6px; left: 6px; } .screw.br { bottom: 6px; right: 6px; }
 
-      /* sheet */
-      .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 9; display: none; }
-      .scrim.open { display: block; }
-      .sheet {
-        position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; transform: translateY(100%); transition: transform .25s ease;
-        background: var(--bg2); border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
-        max-height: 82dvh; overflow-y: auto;
-      }
-      .sheet.open { transform: translateY(0); }
-      .sheet h3 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); margin: 2px 0 12px; font-weight: 600; }
-      .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
-      .pick {
-        border: 1px solid var(--line); border-radius: 12px; padding: 12px 8px; text-align: center; background: var(--glass);
-        display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px;
-      }
-      .pick.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
-      .pick .dot { width: 16px; height: 16px; border-radius: 50%; }
-      .pick .lng { font-size: 15px; }
-      label { display: block; font-size: 12px; color: var(--dim); margin: 14px 0 6px; }
-      select, .sheet input[type=text], textarea {
-        width: 100%; font: inherit; font-size: 15px; color: var(--ink);
-        background: var(--glass); border: 1px solid var(--line); border-radius: 10px; padding: 11px;
-      }
-      select option { background: #11141c; }
-      input[type=range] { width: 100%; accent-color: var(--accent); }
-      .btn { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--glass); margin-top: 12px; }
-      .btn.primary { background: linear-gradient(180deg, #e9f1ff, #a9c6ff); color: #0b0d12; border: none; font-weight: 600; }
-      .row { display: flex; gap: 10px; } .row > * { flex: 1; }
-      .muted { font-size: 12px; color: var(--dim); margin-top: 10px; line-height: 1.5; }
-      #prog { font-size: 12px; color: var(--accent); min-height: 16px; margin-top: 8px; }
+      .jack { width: 22px; height: 22px; border-radius: 50%; margin: 0 auto;
+        background: radial-gradient(circle at 50% 40%, #0a0b0d 0 6px, #3a3f49 7px 9px, #1a1d23 10px);
+        border: 2px solid #0a0b0d; box-shadow: inset 0 0 4px #000, 0 0 0 3px #20242c; }
+      .jacklbl { text-align: center; font-size: 8px; letter-spacing: .2em; color: var(--dim); margin-top: 2px; }
+
+      .mrow { display: flex; align-items: center; gap: 12px; }
+      .mtitle { flex: 1; min-width: 0; }
+      .mtitle .nm { font-size: 13px; letter-spacing: .08em; font-weight: 700; display: flex; align-items: center; gap: 7px; }
+      .mtitle .role { font-size: 10px; color: var(--dim); margin-top: 2px; line-height: 1.3; }
+      .led { width: 10px; height: 10px; border-radius: 50%; background: var(--led-off); box-shadow: inset 0 0 3px #000; flex: 0 0 auto; }
+      .led.active { background: var(--amber); box-shadow: 0 0 10px var(--amber); animation: pulse .7s infinite; }
+      .led.done { background: var(--green); box-shadow: 0 0 8px var(--green); }
+      .led.byp { background: var(--cyan); opacity: .5; }
+      .led.err { background: var(--red); box-shadow: 0 0 8px var(--red); }
+      @keyframes pulse { 50% { opacity: .35; } }
+
+      /* knob */
+      .knob { width: 46px; height: 46px; border-radius: 50%; position: relative; flex: 0 0 auto; cursor: ns-resize;
+        background: radial-gradient(circle at 50% 35%, #4a505c, #20242c 70%); border: 2px solid #0b0d11;
+        box-shadow: 0 2px 4px #000, inset 0 1px 2px rgba(255,255,255,.15); }
+      .knob::after { content: ""; position: absolute; left: 50%; top: 5px; width: 2px; height: 16px; background: var(--gold);
+        transform-origin: 50% 18px; transform: translateX(-50%) rotate(var(--ang, -135deg)); border-radius: 2px; box-shadow: 0 0 4px var(--gold); }
+      .knoblbl { text-align: center; font-size: 8px; color: var(--dim); letter-spacing: .14em; margin-top: 2px; }
+      .knobwrap { display: flex; flex-direction: column; align-items: center; }
+
+      .mctl { display: flex; gap: 6px; margin-top: 10px; }
+      .mctl button { flex: 1; font: inherit; font-size: 10px; letter-spacing: .1em; color: var(--silk);
+        background: #1c2027; border: 1px solid #0b0d11; border-radius: 5px; padding: 7px 4px; }
+      .mctl button.bypon { color: var(--cyan); border-color: var(--cyan); }
+      .read { margin-top: 10px; font-size: 12px; line-height: 1.45; color: #cfe6d8; background: #0e1413;
+        border: 1px solid #0b1110; border-radius: 5px; padding: 8px 10px; min-height: 18px; white-space: pre-wrap;
+        max-height: 120px; overflow-y: auto; box-shadow: inset 0 0 12px rgba(87,227,137,.06); }
+      .read:empty::before { content: "—"; color: #2f4a3f; }
+
+      textarea, select, input[type=text] { width: 100%; font: inherit; font-size: 13px; color: var(--silk);
+        background: #14171c; border: 1px solid #0b0d11; border-radius: 6px; padding: 10px; }
+      .btn { font: inherit; font-size: 11px; letter-spacing: .12em; color: var(--silk); background: #1c2027;
+        border: 1px solid #0b0d11; border-radius: 6px; padding: 11px; width: 100%; cursor: pointer; }
+      .btn.run { background: linear-gradient(180deg, var(--gold), #b88a2c); color: #1a1206; font-weight: 700; border: none; letter-spacing: .2em; }
+      .btn.run:disabled { filter: grayscale(.6) brightness(.7); }
+      .row { display: flex; gap: 8px; } .row > * { flex: 1; }
+
+      /* cable rail */
+      #rack { position: relative; }
+      #cables { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+      .slot { position: relative; z-index: 1; padding: 7px 0; }
+      .label { font-size: 9px; letter-spacing: .24em; color: var(--dim); text-transform: uppercase; margin: 14px 2px 4px; }
+      .muted { font-size: 11px; color: var(--dim); margin-top: 10px; line-height: 1.5; }
+      .status { display: flex; gap: 8px; justify-content: center; font-size: 10px; color: var(--dim); margin-top: 10px; letter-spacing: .14em; }
+      .status b { color: var(--gold); }
+      #prog { font-size: 11px; color: var(--gold); min-height: 14px; margin-top: 6px; text-align: center; }
+
+      dialog { background: var(--steel2); color: var(--silk); border: 1px solid #0b0d11; border-radius: 10px; padding: 14px; width: 90%; max-width: 380px; }
+      dialog::backdrop { background: rgba(0,0,0,.6); }
+      .palette { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .palette button { text-align: left; padding: 10px; }
     </style>
   </head>
   <body>
-    <!-- TOP -->
-    <div class="top">
-      <button class="iconbtn" id="btnLang" title="language" aria-label="language">🌐</button>
-      <button class="iconbtn" id="btnAgent" title="agent" aria-label="agent">◐</button>
-      <span class="sp"></span>
-      <span class="brand">vulcano</span>
-      <span class="sp"></span>
-      <button class="iconbtn" id="btnPower" title="model" aria-label="model">⚡</button>
-      <button class="iconbtn" id="btnNew" title="new" aria-label="new">＋</button>
-    </div>
-
-    <!-- ORB -->
-    <div class="stage">
-      <canvas id="orb" aria-hidden="true"></canvas>
-      <div class="tagline" id="tagline"></div>
-    </div>
-
-    <!-- OUTPUT -->
-    <div class="out" id="out"></div>
-
-    <!-- COMPOSER -->
-    <div class="composer">
-      <button class="iconbtn" id="btnMic" title="speak" aria-label="speak">🎙️</button>
-      <input id="prompt" autocomplete="off" />
-      <button class="iconbtn send" id="btnSend" aria-label="send">➤</button>
-    </div>
-
-    <!-- SHEETS -->
-    <div class="scrim" id="scrim"></div>
-
-    <div class="sheet" id="sheetLang">
-      <h3 id="t_language"></h3>
-      <div class="grid" id="langGrid"></div>
-    </div>
-
-    <div class="sheet" id="sheetAgent">
-      <h3 id="t_agent"></h3>
-      <div class="grid" id="agentGrid"></div>
-      <label id="t_directives"></label>
-      <textarea id="sys" rows="3"></textarea>
-      <div class="row">
-        <input type="text" id="agentName" />
-        <button class="btn" id="forgeBtn" style="margin-top:0"></button>
+    <div class="wrap">
+      <div class="head">
+        <span class="led-pwr"></span>
+        <div>
+          <div class="logo">VULCANO · RACK</div>
+          <div class="tag">patch agenti in catena · on-device</div>
+        </div>
+        <span class="sp"></span>
+        <button class="btn" id="power" style="width:auto;padding:9px 12px">⚡ MODELLO</button>
       </div>
-      <button class="btn" id="delAgent"></button>
+
+      <div id="rack">
+        <svg id="cables"></svg>
+
+        <!-- INPUT -->
+        <div class="slot">
+          <div class="module io">
+            <span class="screw tl"></span><span class="screw tr"></span>
+            <div class="mtitle"><div class="nm">▶ INGRESSO</div><div class="role">il segnale grezzo che entra nella catena</div></div>
+            <textarea id="signal" rows="2" placeholder="Scrivi qui il segnale di partenza…" style="margin-top:10px"></textarea>
+            <div class="jacklbl" style="margin-top:8px">OUT ▽</div>
+            <div class="jack" data-jack="src-out"></div>
+          </div>
+        </div>
+
+        <div id="modules"></div>
+
+        <!-- OUTPUT -->
+        <div class="slot">
+          <div class="module io">
+            <span class="screw bl"></span><span class="screw br"></span>
+            <div class="jack" data-jack="dst-in"></div>
+            <div class="jacklbl">△ IN</div>
+            <div class="mtitle" style="margin-top:8px"><div class="nm">⏍ USCITA</div><div class="role">risultato finale della catena</div></div>
+            <div class="read" id="finalOut"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn" id="addBtn">＋ MODULO</button>
+        <button class="btn run" id="runBtn" style="flex:2">▶ AVVIA CATENA</button>
+      </div>
+      <div id="prog"></div>
+      <div class="status"><span>MODO: <b id="modeChip">DEMO</b></span><span>·</span><span id="chainLen"></span></div>
+      <div class="muted">Tutti i moduli usano <b>un solo modello</b> caricato (cambia solo l'istruzione). Trascina le manopole su/giù per il <b>calore</b>. A modello spento la catena gira in <b>simulazione</b> per mostrarti il flusso.</div>
     </div>
 
-    <div class="sheet" id="sheetModel">
-      <h3 id="t_model"></h3>
-      <select id="model"></select>
-      <button class="btn" id="showAllBtn"></button>
-      <button class="btn primary" id="load"></button>
-      <div id="prog"></div>
-      <label id="t_heat"></label>
-      <input type="range" id="heat" min="0" max="150" value="70" />
-      <div class="muted" id="t_modelnote"></div>
-    </div>
+    <!-- dialog: palette moduli -->
+    <dialog id="dlgAdd">
+      <div class="label" style="margin-top:0">Inserisci modulo</div>
+      <div class="palette" id="palette"></div>
+      <button class="btn" id="closeAdd" style="margin-top:12px">Chiudi</button>
+    </dialog>
+
+    <!-- dialog: modello -->
+    <dialog id="dlgModel">
+      <div class="label" style="margin-top:0">Modello locale (condiviso)</div>
+      <select id="model"><option>— apri per caricare —</option></select>
+      <button class="btn" id="showAll" style="margin-top:8px">+ modelli pesanti</button>
+      <button class="btn run" id="load" style="margin-top:8px">⚡ ACCENDI</button>
+      <div id="prog2" class="muted"></div>
+      <button class="btn" id="closeModel" style="margin-top:12px">Chiudi</button>
+    </dialog>
 
     <script type="module">
       const $ = (id) => document.getElementById(id);
-      const STORE = "vulcano.agents";
       const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+      const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-      // ---------------- I18N (zero geographic/cultural bias: each language in its own script) ----------------
-      const LANGS = {
-        en: { name: "English", bcp: "en-US",
-          tagline: "AI for everyone — on your device, free.", ph: "Speak or write in any language…",
-          language: "Language", agent: "Agent", directives: "Instructions", create: "Create", newName: "New agent name",
-          remove: "Remove selected agent", model: "Engine", showAll: "Show all engines", power: "Power the engine",
-          imagination: "Imagination", cold: "Engine off — demo mode", ready: "Ready",
-          thinking: "thinking…", listening: "listening…",
-          demo: (n) => `[demo] Agent “${n}” is ready, but no model is loaded. Tap ⚡ to power a real on-device model. Nothing leaves your device.`,
-          note: "Needs WebGPU. Lightest models run on any phone. Downloads once, then works offline." },
-        es: { name: "Español", bcp: "es-ES",
-          tagline: "IA para todos — en tu dispositivo, gratis.", ph: "Habla o escribe en cualquier idioma…",
-          language: "Idioma", agent: "Agente", directives: "Instrucciones", create: "Crear", newName: "Nombre del nuevo agente",
-          remove: "Eliminar agente seleccionado", model: "Motor", showAll: "Mostrar todos los motores", power: "Encender el motor",
-          imagination: "Imaginación", cold: "Motor apagado — modo demo", ready: "Listo",
-          thinking: "pensando…", listening: "escuchando…",
-          demo: (n) => `[demo] El agente «${n}» está listo, pero no hay modelo cargado. Toca ⚡ para encender un modelo real en el dispositivo. Nada sale de tu dispositivo.`,
-          note: "Requiere WebGPU. Los modelos más ligeros funcionan en cualquier móvil. Se descarga una vez y luego funciona sin conexión." },
-        ar: { name: "العربية", bcp: "ar-SA", rtl: true,
-          tagline: "ذكاء اصطناعي للجميع — على جهازك، مجانًا.", ph: "تحدث أو اكتب بأي لغة…",
-          language: "اللغة", agent: "الوكيل", directives: "التعليمات", create: "إنشاء", newName: "اسم وكيل جديد",
-          remove: "حذف الوكيل المحدد", model: "المحرك", showAll: "عرض كل المحركات", power: "تشغيل المحرك",
-          imagination: "الخيال", cold: "المحرك متوقف — وضع العرض", ready: "جاهز",
-          thinking: "يفكر…", listening: "يستمع…",
-          demo: (n) => `[عرض] الوكيل «${n}» جاهز، لكن لا يوجد نموذج محمّل. اضغط ⚡ لتشغيل نموذج حقيقي على الجهاز. لا شيء يغادر جهازك.`,
-          note: "يتطلب WebGPU. أخف النماذج تعمل على أي هاتف. يُحمَّل مرة واحدة ثم يعمل دون اتصال." },
-        zh: { name: "中文", bcp: "zh-CN",
-          tagline: "人人可用的 AI —— 在你的设备上，免费。", ph: "用任何语言说或写……",
-          language: "语言", agent: "智能体", directives: "指令", create: "创建", newName: "新智能体名称",
-          remove: "删除所选智能体", model: "引擎", showAll: "显示全部引擎", power: "启动引擎",
-          imagination: "想象力", cold: "引擎关闭 —— 演示模式", ready: "就绪",
-          thinking: "思考中……", listening: "聆听中……",
-          demo: (n) => `[演示] 智能体「${n}」已就绪，但未加载模型。点击 ⚡ 在本机启动真实模型。数据不会离开你的设备。`,
-          note: "需要 WebGPU。最轻量的模型可在任何手机上运行。仅下载一次，之后离线可用。" },
-        hi: { name: "हिन्दी", bcp: "hi-IN",
-          tagline: "सबके लिए AI — आपके डिवाइस पर, मुफ़्त।", ph: "किसी भी भाषा में बोलें या लिखें…",
-          language: "भाषा", agent: "एजेंट", directives: "निर्देश", create: "बनाएँ", newName: "नए एजेंट का नाम",
-          remove: "चयनित एजेंट हटाएँ", model: "इंजन", showAll: "सभी इंजन दिखाएँ", power: "इंजन चालू करें",
-          imagination: "कल्पना", cold: "इंजन बंद — डेमो मोड", ready: "तैयार",
-          thinking: "सोच रहा है…", listening: "सुन रहा है…",
-          demo: (n) => `[डेमो] एजेंट “${n}” तैयार है, पर कोई मॉडल लोड नहीं है। डिवाइस पर असली मॉडल चलाने के लिए ⚡ दबाएँ। कुछ भी आपके डिवाइस से बाहर नहीं जाता।`,
-          note: "WebGPU चाहिए। सबसे हल्के मॉडल किसी भी फ़ोन पर चलते हैं। एक बार डाउनलोड, फिर ऑफ़लाइन।" },
-        sw: { name: "Kiswahili", bcp: "sw-KE",
-          tagline: "AI kwa kila mtu — kwenye kifaa chako, bure.", ph: "Sema au andika kwa lugha yoyote…",
-          language: "Lugha", agent: "Wakala", directives: "Maelekezo", create: "Tengeneza", newName: "Jina la wakala mpya",
-          remove: "Ondoa wakala uliochaguliwa", model: "Injini", showAll: "Onyesha injini zote", power: "Washa injini",
-          imagination: "Ubunifu", cold: "Injini imezimwa — hali ya onyesho", ready: "Tayari",
-          thinking: "inafikiri…", listening: "inasikiliza…",
-          demo: (n) => `[onyesho] Wakala “${n}” yuko tayari, lakini hakuna modeli iliyopakiwa. Gusa ⚡ kuwasha modeli halisi kwenye kifaa. Hakuna kinachotoka kwenye kifaa chako.`,
-          note: "Inahitaji WebGPU. Modeli nyepesi zinafanya kazi kwenye simu yoyote. Hupakuliwa mara moja, kisha hufanya kazi nje ya mtandao." },
-        ru: { name: "Русский", bcp: "ru-RU",
-          tagline: "ИИ для всех — на вашем устройстве, бесплатно.", ph: "Говорите или пишите на любом языке…",
-          language: "Язык", agent: "Агент", directives: "Инструкции", create: "Создать", newName: "Имя нового агента",
-          remove: "Удалить выбранного агента", model: "Движок", showAll: "Показать все движки", power: "Запустить движок",
-          imagination: "Воображение", cold: "Движок выключен — демо-режим", ready: "Готово",
-          thinking: "думает…", listening: "слушает…",
-          demo: (n) => `[демо] Агент «${n}» готов, но модель не загружена. Нажмите ⚡, чтобы запустить настоящую модель на устройстве. Ничего не покидает ваше устройство.`,
-          note: "Требуется WebGPU. Самые лёгкие модели работают на любом телефоне. Загружается один раз, затем работает офлайн." },
-        fr: { name: "Français", bcp: "fr-FR",
-          tagline: "L’IA pour tous — sur votre appareil, gratuite.", ph: "Parlez ou écrivez dans n’importe quelle langue…",
-          language: "Langue", agent: "Agent", directives: "Instructions", create: "Créer", newName: "Nom du nouvel agent",
-          remove: "Supprimer l’agent sélectionné", model: "Moteur", showAll: "Afficher tous les moteurs", power: "Démarrer le moteur",
-          imagination: "Imagination", cold: "Moteur éteint — mode démo", ready: "Prêt",
-          thinking: "réflexion…", listening: "écoute…",
-          demo: (n) => `[démo] L’agent « ${n} » est prêt, mais aucun modèle n’est chargé. Touchez ⚡ pour lancer un vrai modèle sur l’appareil. Rien ne quitte votre appareil.`,
-          note: "Nécessite WebGPU. Les modèles les plus légers fonctionnent sur n’importe quel téléphone. Téléchargé une fois, puis hors ligne." },
+      // ---------- moduli di segnale (pipeline) ----------
+      const MODS = {
+        amp:    { name: "AMPLIFY", color: "#ff7a7a", role: "espande ed elabora il segnale",
+          system: "Espandi e arricchisci il testo dell'utente con dettagli utili, mantenendo il senso. Rispondi solo col testo elaborato, stessa lingua.",
+          demo: (s) => s + " — inoltre, in dettaglio: " + s.toLowerCase() },
+        comp:   { name: "COMPRESS", color: "#7ad1ff", role: "riassume in poche parole",
+          system: "Riassumi il testo dell'utente in 1 frase essenziale, stessa lingua. Solo il riassunto.",
+          demo: (s) => s.split(/\s+/).slice(0, 8).join(" ") + "…" },
+        trans:  { name: "TRANSLATE", color: "#ffd166", role: "traduce in inglese",
+          system: "Translate the user's text to English. Output only the translation.",
+          demo: (s) => "[→EN] " + s },
+        filter: { name: "FILTER", color: "#9ae6b4", role: "estrae i concetti chiave",
+          system: "Estrai i concetti chiave del testo come elenco puntato brevissimo, stessa lingua. Solo l'elenco.",
+          demo: (s) => "• " + s.split(/\s+/).filter((w) => w.length > 4).slice(0, 6).join("\n• ") },
+        distort:{ name: "DISTORT", color: "#c4b5fd", role: "rende creativo e audace",
+          system: "Riscrivi il testo in modo creativo, audace e sorprendente, stessa lingua. Solo il testo.",
+          demo: (s) => s.toUpperCase() + " ⚡" },
+        polish: { name: "POLISH", color: "#f0f4f8", role: "pulisce e rifinisce",
+          system: "Riscrivi il testo in modo chiaro, corretto e scorrevole, stessa lingua. Solo il testo.",
+          demo: (s) => { s = s.trim(); return s.charAt(0).toUpperCase() + s.slice(1) + (/[.!?]$/.test(s) ? "" : "."); } },
+        critic: { name: "CRITIQUE", color: "#ffa94d", role: "trova punti deboli",
+          system: "Elenca brevemente i punti deboli o i rischi del testo dell'utente, stessa lingua. Solo l'elenco.",
+          demo: (s) => "Punti deboli (sim.): chiarezza, ambiguità.\nRif: " + s.slice(0, 48) + "…" },
       };
-      let lang = localStorage.getItem("vulcano.lang") || (navigator.language || "en").slice(0, 2);
-      if (!LANGS[lang]) lang = "en";
 
-      function applyLang() {
-        const L = LANGS[lang];
-        document.documentElement.lang = lang;
-        document.documentElement.dir = L.rtl ? "rtl" : "ltr";
-        $("tagline").textContent = L.tagline;
-        $("prompt").placeholder = L.ph;
-        $("t_language").textContent = L.language;
-        $("t_agent").textContent = L.agent;
-        $("t_directives").textContent = L.directives;
-        $("t_model").textContent = L.model;
-        $("t_heat").textContent = L.imagination;
-        $("t_modelnote").textContent = L.note;
-        $("forgeBtn").textContent = L.create;
-        $("agentName").placeholder = L.newName;
-        $("delAgent").textContent = L.remove;
-        $("showAllBtn").textContent = L.showAll;
-        $("load").textContent = L.power;
-        if (!modelLoaded) $("prog").textContent = L.cold;
-        localStorage.setItem("vulcano.lang", lang);
-      }
-      function renderLangs() {
-        const g = $("langGrid"); g.innerHTML = "";
-        for (const code of Object.keys(LANGS)) {
-          const b = document.createElement("button");
-          b.className = "pick" + (code === lang ? " on" : "");
-          b.innerHTML = `<span class="lng">${LANGS[code].name}</span>`;
-          b.onclick = () => { lang = code; applyLang(); renderLangs(); resetChat(); closeSheets(); };
-          g.appendChild(b);
-        }
-      }
-
-      // ---------------- AGENTS (universal pictograms, names shown in chosen language where natural) ----------------
-      const BUILTIN = [
-        { id: "generale", color: "#cfe3ff", glyph: "◐", names: { en: "Companion", es: "Compañero", ar: "رفيق", zh: "助手", hi: "साथी", sw: "Mwenza", ru: "Спутник", fr: "Compagnon" },
-          system: "You are a helpful, concise assistant." },
-        { id: "coder", color: "#a7f3d0", glyph: "⌨", names: { en: "Builder", es: "Constructor", ar: "مُنشئ", zh: "构建者", hi: "निर्माता", sw: "Mjenzi", ru: "Строитель", fr: "Bâtisseur" },
-          system: "You are an expert programming assistant. Give correct code and short explanations." },
-        { id: "traduttore", color: "#fde68a", glyph: "⇄", names: { en: "Bridge", es: "Puente", ar: "جسر", zh: "桥", hi: "सेतु", sw: "Daraja", ru: "Мост", fr: "Pont" },
-          system: "You are a translator. Translate the user's text to the language they ask for, output only the translation." },
-        { id: "tutor", color: "#c4b5fd", glyph: "✶", names: { en: "Teacher", es: "Maestro", ar: "معلّم", zh: "老师", hi: "शिक्षक", sw: "Mwalimu", ru: "Учитель", fr: "Maître" },
-          system: "You are a patient teacher. Explain ideas simply with everyday examples." },
-        { id: "brainstorm", color: "#fca5a5", glyph: "✷", names: { en: "Spark", es: "Chispa", ar: "شرارة", zh: "灵感", hi: "चिंगारी", sw: "Cheche", ru: "Искра", fr: "Étincelle" },
-          system: "You are a creative partner. Generate original, concrete ideas as a short list." },
+      // catena iniziale: una pipeline d'esempio
+      let uidc = 0;
+      const uid = () => "m" + (++uidc);
+      let chain = [
+        { uid: uid(), type: "amp", temp: 70, bypass: false, out: "" },
+        { uid: uid(), type: "comp", temp: 40, bypass: false, out: "" },
+        { uid: uid(), type: "polish", temp: 30, bypass: false, out: "" },
       ];
-      const loadCustom = () => { try { return JSON.parse(localStorage.getItem(STORE)) || []; } catch { return []; } };
-      const saveCustom = (a) => localStorage.setItem(STORE, JSON.stringify(a));
-      let selected = "b:generale";
-      const agentName = (a) => (a.names ? (a.names[lang] || a.names.en) : a.name);
 
-      function currentAgent() {
-        const [g, id] = selected.split(":");
-        const list = g === "c" ? loadCustom() : BUILTIN;
-        return list.find((a) => a.id === id) || BUILTIN[0];
-      }
-      function renderAgents(sel) {
-        if (sel) selected = sel;
-        const grid = $("agentGrid"); grid.innerHTML = "";
-        const make = (a, g) => {
-          const v = (g === "c" ? "c:" : "b:") + a.id;
-          const b = document.createElement("button");
-          b.className = "pick" + (v === selected ? " on" : "");
-          b.innerHTML = `<span class="dot" style="background:${a.color || "#cfe3ff"}"></span><span>${a.glyph || "◆"} ${agentName(a)}</span>`;
-          b.onclick = () => { selected = v; $("sys").value = currentAgent().system; renderAgents(); };
-          grid.appendChild(b);
-        };
-        BUILTIN.forEach((a) => make(a, "b"));
-        loadCustom().forEach((a) => make(a, "c"));
-        $("sys").value = currentAgent().system;
-        $("btnAgent").textContent = currentAgent().glyph || "◐";
+      // ---------- render catena ----------
+      function render() {
+        const host = $("modules"); host.innerHTML = "";
+        chain.forEach((m, i) => {
+          const mod = MODS[m.type];
+          const slot = document.createElement("div"); slot.className = "slot";
+          slot.innerHTML = `
+            <div class="module" data-uid="${m.uid}">
+              <span class="screw tl"></span><span class="screw tr"></span><span class="screw bl"></span><span class="screw br"></span>
+              <div class="jacklbl">△ IN</div><div class="jack" data-jack="in"></div>
+              <div class="mrow" style="margin-top:8px">
+                <div class="led ${m.bypass ? "byp" : ""}"></div>
+                <div class="mtitle">
+                  <div class="nm"><span style="color:${mod.color}">●</span> ${mod.name}</div>
+                  <div class="role">${mod.role}</div>
+                </div>
+                <div class="knobwrap">
+                  <div class="knob" data-knob></div>
+                  <div class="knoblbl">CALORE</div>
+                </div>
+              </div>
+              <div class="read"></div>
+              <div class="mctl">
+                <button data-act="up">▲</button>
+                <button data-act="down">▼</button>
+                <button data-act="byp" class="${m.bypass ? "bypon" : ""}">BYPASS</button>
+                <button data-act="del">✕</button>
+              </div>
+              <div class="jacklbl" style="margin-top:8px">OUT ▽</div><div class="jack" data-jack="out"></div>
+            </div>`;
+          host.appendChild(slot);
+          const card = slot.querySelector(".module");
+          card.querySelector(".read").textContent = m.out || "";
+          // knob
+          const knob = card.querySelector(".knob");
+          const setAng = () => knob.style.setProperty("--ang", (-135 + (m.temp / 150) * 270).toFixed(1) + "deg");
+          setAng();
+          let active = false, sy = 0, sv = 0;
+          knob.addEventListener("pointerdown", (e) => { active = true; sy = e.clientY; sv = m.temp; knob.setPointerCapture(e.pointerId); });
+          knob.addEventListener("pointermove", (e) => { if (!active) return; m.temp = clamp(Math.round(sv + (sy - e.clientY)), 0, 150); setAng(); });
+          knob.addEventListener("pointerup", () => { active = false; });
+          // actions
+          card.querySelectorAll(".mctl button").forEach((b) => b.onclick = () => {
+            const a = b.dataset.act;
+            if (a === "up" && i > 0) { [chain[i - 1], chain[i]] = [chain[i], chain[i - 1]]; }
+            else if (a === "down" && i < chain.length - 1) { [chain[i + 1], chain[i]] = [chain[i], chain[i + 1]]; }
+            else if (a === "byp") { m.bypass = !m.bypass; }
+            else if (a === "del") { chain = chain.filter((x) => x.uid !== m.uid); }
+            render();
+          });
+        });
+        $("chainLen").textContent = chain.filter((m) => !m.bypass).length + " STADI ATTIVI";
+        requestAnimationFrame(drawCables);
       }
 
-      // ---------------- MODELS (lazy WebLLM) ----------------
-      let webllm = null, modelsListed = false, modelLoaded = false, showAll = false;
+      // ---------- cavi (SVG bezier tra i jack) ----------
+      function drawCables() {
+        const rack = $("rack"), svg = $("cables");
+        const R = rack.getBoundingClientRect();
+        svg.setAttribute("width", R.width); svg.setAttribute("height", R.height);
+        svg.setAttribute("viewBox", `0 0 ${R.width} ${R.height}`);
+        const center = (el) => { const b = el.getBoundingClientRect(); return { x: b.left - R.left + b.width / 2, y: b.top - R.top + b.height / 2 }; };
+        const colors = ["#ff7a7a", "#7ad1ff", "#ffd166", "#9ae6b4", "#c4b5fd"];
+        // ordine di flusso: src-out -> (mod.in, mod.out)* -> dst-in; collego le coppie consecutive
+        const flow = [];
+        flow.push(rack.querySelector('[data-jack="src-out"]'));
+        chain.forEach((m) => { const c = rack.querySelector(`[data-uid="${m.uid}"]`); if (c) { flow.push(c.querySelector('[data-jack="in"]')); flow.push(c.querySelector('[data-jack="out"]')); } });
+        flow.push(rack.querySelector('[data-jack="dst-in"]'));
+        let svgInner = "";
+        for (let i = 0; i + 1 < flow.length; i += 2) {
+          const a = center(flow[i]), b = center(flow[i + 1]);
+          const sag = Math.max(18, (b.y - a.y) * 0.4);
+          const col = colors[(i / 2) % colors.length];
+          svgInner += `<path d="M ${a.x} ${a.y} C ${a.x} ${a.y + sag}, ${b.x} ${b.y - sag}, ${b.x} ${b.y}" fill="none" stroke="${col}" stroke-width="3" stroke-linecap="round" opacity="0.85"/>`;
+          svgInner += `<circle cx="${a.x}" cy="${a.y}" r="3" fill="${col}"/><circle cx="${b.x}" cy="${b.y}" r="3" fill="${col}"/>`;
+        }
+        svg.innerHTML = svgInner;
+      }
+      addEventListener("resize", drawCables);
+      addEventListener("scroll", drawCables, { passive: true });
+
+      // ---------- modello (WebLLM lazy) ----------
+      let webllm = null, listed = false, modelOn = false, showAll = false, mode = "demo";
+      let engine = null, loadedModel = null;
       async function importWebLLM() { if (!webllm) webllm = await import("https://esm.run/@mlc-ai/web-llm"); return webllm; }
       async function listModels() {
         const sel = $("model");
         try {
           const w = await importWebLLM();
-          const list = w.prebuiltAppConfig.model_list
-            .filter((m) => showAll || m.low_resource_required)
+          const list = w.prebuiltAppConfig.model_list.filter((m) => showAll || m.low_resource_required)
             .sort((a, b) => (a.vram_required_MB || 1e9) - (b.vram_required_MB || 1e9));
           sel.innerHTML = "";
-          for (const m of list) {
-            const o = document.createElement("option");
+          for (const m of list) { const o = document.createElement("option");
             const gb = m.vram_required_MB ? ` · ~${(m.vram_required_MB / 1024).toFixed(1)} GB` : "";
-            o.value = m.model_id; o.textContent = m.model_id + gb; sel.appendChild(o);
-          }
+            o.value = m.model_id; o.textContent = m.model_id + gb; sel.appendChild(o); }
           const def = list.find((m) => /Qwen2\.5-1\.5B|Llama-3\.2-1B/.test(m.model_id)) || list[0];
-          if (def) sel.value = def.model_id;
-          modelsListed = true;
+          if (def) sel.value = def.model_id; listed = true;
         } catch { sel.innerHTML = "<option>—</option>"; }
       }
-
-      // ---------------- ORB (universal: a living light = your device thinking) ----------------
-      const orb = $("orb"), octx = orb.getContext("2d");
-      let dpr = Math.min(devicePixelRatio || 1, 2), t = 0, intensity = 0.0, targetI = 0.0, dust = [];
-      function sizeOrb() {
-        const s = Math.min(innerWidth * 0.7, 300);
-        orb.style.width = orb.style.height = s + "px";
-        orb.width = s * dpr; orb.height = s * dpr;
-      }
-      addEventListener("resize", sizeOrb); sizeOrb();
-      for (let i = 0; i < 36; i++) dust.push({ a: Math.random() * 6.28, r: 0.5 + Math.random() * 0.5, sp: 0.2 + Math.random() * 0.6, ph: Math.random() * 6.28 });
-      function drawOrb() {
-        const w = orb.width, h = orb.height, cxp = w / 2, cyp = h / 2, R = Math.min(w, h) / 2;
-        octx.clearRect(0, 0, w, h);
-        intensity += (targetI - intensity) * 0.06;
-        const breath = 0.5 + 0.5 * Math.sin(t * 0.9);
-        const core = R * (0.34 + 0.05 * breath + 0.06 * intensity);
-        // spectral aura (inclusive, no single color) — slow hue rotation, desaturated
-        const hue = (t * 12) % 360;
-        const aura = octx.createRadialGradient(cxp, cyp, core * 0.4, cxp, cyp, R);
-        aura.addColorStop(0, `hsla(${hue},70%,85%,${0.5 + 0.4 * intensity})`);
-        aura.addColorStop(0.45, `hsla(${(hue + 60) % 360},65%,70%,${0.16 + 0.2 * intensity})`);
-        aura.addColorStop(1, "hsla(220,40%,10%,0)");
-        octx.fillStyle = aura; octx.beginPath(); octx.arc(cxp, cyp, R, 0, 6.2832); octx.fill();
-        // core light
-        const cg = octx.createRadialGradient(cxp, cyp, 0, cxp, cyp, core);
-        cg.addColorStop(0, "rgba(255,255,255,0.98)");
-        cg.addColorStop(0.6, `hsla(${(hue + 30) % 360},60%,88%,0.9)`);
-        cg.addColorStop(1, "rgba(255,255,255,0)");
-        octx.fillStyle = cg; octx.beginPath(); octx.arc(cxp, cyp, core, 0, 6.2832); octx.fill();
-        // orbiting dust (motes of light)
-        for (const d of dust) {
-          const ang = d.a + t * d.sp * (0.4 + intensity);
-          const rad = R * (0.55 + 0.4 * Math.sin(t * 0.5 + d.ph)) * d.r;
-          const x = cxp + Math.cos(ang) * rad, y = cyp + Math.sin(ang) * rad;
-          octx.globalAlpha = 0.35 + 0.5 * intensity;
-          octx.fillStyle = `hsla(${(hue + 90) % 360},80%,85%,1)`;
-          octx.beginPath(); octx.arc(x, y, 1.6 * dpr, 0, 6.2832); octx.fill();
-        }
-        octx.globalAlpha = 1;
-        t += 0.016 + 0.02 * intensity;
-        requestAnimationFrame(drawOrb);
-      }
-      drawOrb();
-
-      // ---------------- ENGINE ----------------
-      let engine = null, loadedModel = null, mode = "demo", busy = false;
-      const history = [];
-      const onProgress = (r) => { $("prog").textContent = `${(r.progress || 0) * 100 | 0}% · ${r.text}`; targetI = 0.2 + (r.progress || 0) * 0.6; };
       async function ensureModel() {
-        if (!modelsListed) await listModels();
-        const id = $("model").value; if (!id || id === "—") throw new Error("no engine");
+        if (!listed) await listModels();
+        const id = $("model").value; if (!id || id === "—") throw new Error("scegli un modello");
         if (engine && loadedModel === id) return engine;
         const w = await importWebLLM();
-        if (!engine) engine = await w.CreateMLCEngine(id, { initProgressCallback: onProgress });
+        const cb = (r) => { $("prog2").textContent = `${(r.progress || 0) * 100 | 0}% · ${r.text}`; $("prog").textContent = `caricamento ${(r.progress || 0) * 100 | 0}%`; };
+        if (!engine) engine = await w.CreateMLCEngine(id, { initProgressCallback: cb });
         else await engine.reload(id);
-        loadedModel = id; modelLoaded = true; mode = "local"; targetI = 0.15;
-        $("prog").textContent = LANGS[lang].ready + " · " + id;
+        loadedModel = id; modelOn = true; mode = "local"; $("modeChip").textContent = "LEGA FUSA";
+        $("prog2").textContent = "pronto · " + id; $("prog").textContent = "modello pronto";
         return engine;
       }
-      async function* demoStream(text, agent) {
-        const msg = LANGS[lang].demo(agentName(agent));
-        let buf = "";
-        for (const ch of msg) { buf += ch; if (buf.length >= 3) { yield buf; buf = ""; await sleep(20); } }
-        if (buf) yield buf;
-      }
 
-      // ---------------- OUTPUT ----------------
-      function isRTLText(s) { return /[֐-׿؀-ۿ܀-߿]/.test((s || "").trim()[0] || ""); }
-      function addTurn(cls) { const d = document.createElement("div"); d.className = "turn " + cls; $("out").append(d); d.scrollIntoView({ block: "end" }); return d; }
-      function resetChat() { history.length = 0; $("out").innerHTML = ""; const n = addTurn("note"); n.textContent = LANGS[lang].tagline; }
-      async function send() {
-        if (busy) return;
-        const text = $("prompt").value.trim(); if (!text) return;
-        busy = true; $("prompt").value = "";
-        const agent = currentAgent();
-        const yt = addTurn("you"); yt.textContent = text; yt.dir = isRTLText(text) ? "rtl" : "ltr";
-        history.push({ role: "user", content: text });
-        const at = addTurn("ai"); at.textContent = LANGS[lang].thinking;
-        targetI = 1.0;
-        try {
+      // ---------- processa un modulo ----------
+      async function processModule(m, input, onChunk) {
+        const mod = MODS[m.type];
+        if (mode === "local") {
+          const eng = await ensureModel();
+          const stream = await eng.chat.completions.create({
+            messages: [{ role: "system", content: mod.system }, { role: "user", content: input }],
+            stream: true, temperature: m.temp / 100 });
           let acc = "";
-          if (mode === "local") {
-            const eng = await ensureModel();
-            const sys = ($("sys").value.trim() || "You are helpful.") + ` Always reply in the user's language (${LANGS[lang].name}).`;
-            const stream = await eng.chat.completions.create({ messages: [{ role: "system", content: sys }, ...history], stream: true, temperature: +$("heat").value / 100 });
-            at.textContent = "";
-            for await (const c of stream) { const d = c.choices?.[0]?.delta?.content || ""; if (d) { acc += d; at.textContent = acc; at.scrollIntoView({ block: "end" }); } }
-          } else {
-            at.textContent = "";
-            for await (const c of demoStream(text, agent)) { acc += c; at.textContent = acc; at.scrollIntoView({ block: "end" }); }
-          }
-          at.dir = isRTLText(acc) ? "rtl" : "ltr";
-          history.push({ role: "assistant", content: acc });
-        } catch (e) { at.textContent = "⚠ " + (e?.message || e); }
-        finally { busy = false; targetI = mode === "local" ? 0.15 : 0.0; }
+          for await (const c of stream) { const d = c.choices?.[0]?.delta?.content || ""; if (d) { acc += d; onChunk(d); } }
+          return acc.trim();
+        } else {
+          const result = String(mod.demo(input));
+          let buf = "";
+          for (const ch of result) { buf += ch; if (buf.length >= 3) { onChunk(buf); buf = ""; await sleep(14); } }
+          if (buf) onChunk(buf);
+          return result;
+        }
       }
 
-      // ---------------- VOICE (pre-literate access) ----------------
-      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SR) $("btnMic").style.display = "none";
-      $("btnMic").onclick = () => {
-        if (!SR) return;
-        const rec = new SR(); rec.lang = LANGS[lang].bcp; rec.interimResults = false;
-        $("prompt").placeholder = LANGS[lang].listening; targetI = 0.6;
-        rec.onresult = (e) => { $("prompt").value = e.results[0][0].transcript; send(); };
-        rec.onend = () => { $("prompt").placeholder = LANGS[lang].ph; if (!busy) targetI = mode === "local" ? 0.15 : 0.0; };
-        rec.onerror = rec.onend; rec.start();
-      };
+      // ---------- avvia catena ----------
+      let busy = false;
+      async function run() {
+        if (busy) return;
+        const input = $("signal").value.trim(); if (!input) { $("prog").textContent = "inserisci un segnale"; return; }
+        busy = true; $("runBtn").disabled = true; $("finalOut").textContent = "";
+        chain.forEach((m) => { m.out = ""; });
+        let sig = input;
+        for (const m of chain) {
+          const card = $("modules").querySelector(`[data-uid="${m.uid}"]`);
+          const led = card.querySelector(".led"), read = card.querySelector(".read");
+          if (m.bypass) { led.className = "led byp"; continue; }
+          led.className = "led active"; read.textContent = "";
+          try { sig = await processModule(m, sig, (ch) => { read.textContent += ch; read.scrollTop = read.scrollHeight; }); }
+          catch (e) { read.textContent = "⚠ " + (e?.message || e); led.className = "led err"; busy = false; $("runBtn").disabled = false; return; }
+          m.out = sig; led.className = "led done";
+        }
+        $("finalOut").textContent = sig;
+        $("finalOut").scrollIntoView({ block: "center", behavior: "smooth" });
+        $("prog").textContent = "catena completata";
+        busy = false; $("runBtn").disabled = false;
+      }
 
-      // ---------------- SHEETS ----------------
-      const sheets = ["sheetLang", "sheetAgent", "sheetModel"];
-      function closeSheets() { sheets.forEach((s) => $(s).classList.remove("open")); $("scrim").classList.remove("open"); }
-      function openSheet(id) { closeSheets(); $(id).classList.add("open"); $("scrim").classList.add("open"); }
-      $("scrim").onclick = closeSheets;
-      $("btnLang").onclick = () => { renderLangs(); openSheet("sheetLang"); };
-      $("btnAgent").onclick = () => { renderAgents(); openSheet("sheetAgent"); };
-      $("btnPower").onclick = async () => { openSheet("sheetModel"); if (!modelsListed) await listModels(); };
+      // ---------- palette / dialog ----------
+      function renderPalette() {
+        const p = $("palette"); p.innerHTML = "";
+        for (const [id, mod] of Object.entries(MODS)) {
+          const b = document.createElement("button"); b.className = "btn";
+          b.innerHTML = `<span style="color:${mod.color}">●</span> ${mod.name}<div style="font-size:9px;color:var(--dim);margin-top:3px">${mod.role}</div>`;
+          b.onclick = () => { chain.push({ uid: uid(), type: id, temp: 60, bypass: false, out: "" }); $("dlgAdd").close(); render(); };
+          p.appendChild(b);
+        }
+      }
 
-      // ---------------- EVENTS ----------------
-      $("btnSend").onclick = send;
-      $("btnNew").onclick = resetChat;
-      $("prompt").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); send(); } });
-      $("prompt").addEventListener("input", () => { $("prompt").dir = isRTLText($("prompt").value) ? "rtl" : "ltr"; });
-      $("load").onclick = () => ensureModel().catch((e) => { $("prog").textContent = "⚠ " + (e?.message || e); });
-      $("showAllBtn").onclick = async () => { showAll = !showAll; modelsListed = false; await listModels(); };
-      $("forgeBtn").onclick = () => {
-        const name = $("agentName").value.trim(), system = $("sys").value.trim();
-        if (!name || !system) return;
-        const custom = loadCustom(), id = "u" + Date.now();
-        custom.push({ id, color: "#9ae6b4", glyph: "✦", name, system }); saveCustom(custom);
-        $("agentName").value = ""; renderAgents("c:" + id);
-      };
-      $("delAgent").onclick = () => {
-        if (!selected.startsWith("c:")) return;
-        saveCustom(loadCustom().filter((a) => a.id !== selected.slice(2))); renderAgents("b:generale");
-      };
+      // ---------- eventi ----------
+      $("addBtn").onclick = () => { renderPalette(); $("dlgAdd").showModal(); };
+      $("closeAdd").onclick = () => $("dlgAdd").close();
+      $("power").onclick = async () => { $("dlgModel").showModal(); if (!listed) await listModels(); };
+      $("closeModel").onclick = () => $("dlgModel").close();
+      $("load").onclick = () => ensureModel().catch((e) => { $("prog2").textContent = "⚠ " + (e?.message || e); });
+      $("showAll").onclick = async () => { showAll = !showAll; listed = false; await listModels(); };
+      $("runBtn").onclick = run;
+      $("signal").addEventListener("input", drawCables);
 
-      // ---------------- INIT ----------------
-      applyLang(); renderAgents("b:generale"); resetChat();
+      // ---------- init ----------
+      render();
       if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
         addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
     </script>
